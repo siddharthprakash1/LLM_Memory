@@ -1,0 +1,87 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "llm-memory"
+version = "0.1.0"
+description = "Hierarchical Long-Term Memory for LLM Agents - Real memory with decay, consolidation, and intent-aware retrieval"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [
+    { name = "LLM Memory Project" }
+]
+keywords = [
+    "llm",
+    "memory",
+    "agents",
+    "cognitive-architecture",
+    "ai",
+    "embeddings",
+    "vector-database"
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+
+dependencies = [
+    "pydantic>=2.0.0",
+    "chromadb>=0.4.0",
+    "openai>=1.0.0",
+    "numpy>=1.24.0",
+    "aiosqlite>=0.19.0",
+    "python-ulid>=2.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "hypothesis>=6.0.0",
+    "black>=23.0.0",
+    "ruff>=0.1.0",
+    "mypy>=1.0.0",
+]
+langchain = [
+    "langchain>=0.1.0",
+    "langchain-core>=0.1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/llm-memory/llm-memory"
+Documentation = "https://github.com/llm-memory/llm-memory#readme"
+Repository = "https://github.com/llm-memory/llm-memory"
+Issues = "https://github.com/llm-memory/llm-memory/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["llm_memory"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+addopts = "-v --cov=llm_memory --cov-report=term-missing"
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_return_any = true
+warn_unused_ignores = true
