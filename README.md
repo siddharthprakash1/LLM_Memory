@@ -39,7 +39,7 @@ A comprehensive, production-ready memory system for AI agents implementing cogni
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/llm-memory.git
+git clone https://github.com/siddharthprakash1/LLM_Memory.git
 cd llm-memory
 
 # Create virtual environment (Python 3.11+ recommended)

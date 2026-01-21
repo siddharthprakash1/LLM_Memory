@@ -68,10 +68,10 @@ memory-agent = "llm_memory.agent.cli:main"
 memory-agent-ui = "llm_memory.agent.web_ui:main"
 
 [project.urls]
-Homepage = "https://github.com/llm-memory/llm-memory"
-Documentation = "https://github.com/llm-memory/llm-memory#readme"
-Repository = "https://github.com/llm-memory/llm-memory"
-Issues = "https://github.com/llm-memory/llm-memory/issues"
+Homepage = "https://github.com/siddharthprakash1/LLM_Memory"
+Documentation = "https://github.com/siddharthprakash1/LLM_Memory#readme"
+Repository = "https://github.com/siddharthprakash1/LLM_Memory"
+Issues = "https://github.com/siddharthprakash1/LLM_Memory/issues"
 
 [tool.hatch.build.targets.wheel]
 packages = ["llm_memory"]
