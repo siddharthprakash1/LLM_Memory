@@ -1,162 +1,280 @@
-# 🧠 LLM Memory
+# LLM Memory - Hierarchical Long-Term Memory for AI Agents
 
-**Hierarchical Long-Term Memory for LLM Agents**
+A comprehensive, production-ready memory system for AI agents implementing cognitive architecture principles with three-tier hierarchical memory, decay functions, conflict resolution, and intent-aware retrieval.
 
-> Real memory, not chat history. A cognitive architecture with decay, consolidation, and intent-aware retrieval.
+## 🌟 Features
 
----
+### Memory Hierarchy
+- **Short-Term Memory (STM)**: Conversation context and working memory with attention-based salience
+- **Episodic Memory**: Event-based memories with temporal context and emotional tagging
+- **Semantic Memory**: Factual knowledge with structured fact storage and generalization
 
-## 🎯 The Problem
+### Memory Decay
+- **Ebbinghaus Forgetting Curve**: Realistic memory decay over time
+- **Importance Scoring**: Multi-factor importance calculation (emotional salience, novelty, relevance)
+- **Rehearsal Boost**: Memory strengthening through repeated access
 
-Most "memory" systems for LLMs are just vector similarity search over conversation history. They lack:
-- **Memory decay** - everything stays equally "fresh" forever
-- **Consolidation** - experiences never become knowledge
-- **Conflict resolution** - contradictory facts coexist silently
-- **Intent-aware retrieval** - all queries are treated the same
+### Consolidation Pipeline
+- **STM → Episodic Promotion**: Automatic promotion based on importance and age
+- **Episodic → Semantic Extraction**: Fact extraction and knowledge generalization
+- **Memory Merging**: Intelligent deduplication and fact strengthening
+- **Garbage Collection**: Automatic cleanup of decayed memories
 
-## 💡 The Solution
+### Conflict Resolution
+- **Contradiction Detection**: Identifies temporal, factual, and preference conflicts
+- **Multiple Strategies**: Recency, confidence, source reliability, importance-based resolution
+- **User-Guided Resolution**: Support for human-in-the-loop conflict resolution
 
-A three-tier hierarchical memory system inspired by cognitive science:
+### Intent-Aware Retrieval
+- **Query Intent Classification**: Factual, procedural, episodic, preference, problem-solving
+- **Multi-Tier Search**: Searches across all memory tiers with intent weighting
+- **Result Re-ranking**: Importance, recency, and relevance-based ranking
 
-```
-┌─────────────────────────────────────────────────────────────────┐
-│                    RETRIEVAL LAYER                              │
-│         (Intent-aware, task-scoped memory access)               │
-└─────────────────────────────────────────────────────────────────┘
-                              ▲
-          ┌───────────────────┼───────────────────┐
-          ▼                   ▼                   ▼
-┌─────────────────┐ ┌─────────────────┐ ┌─────────────────┐
-│  SHORT-TERM     │ │   EPISODIC      │ │   SEMANTIC      │
-│  MEMORY (STM)   │ │   MEMORY        │ │   MEMORY        │
-├─────────────────┤ ├─────────────────┤ ├─────────────────┤
-│ • Working ctx   │ │ • Events        │ │ • Facts         │
-│ • Current task  │ │ • Experiences   │ │ • Patterns      │
-│ • Fast decay    │ │ • Temporal tags │ │ • Generalizations│
-│ • High capacity │ │ • Medium decay  │ │ • Slow decay    │
-└────────┬────────┘ └────────┬────────┘ └────────┬────────┘
-         │                   │                   │
-         └───────► CONSOLIDATION ◄───────────────┘
-                   (STM → Episodic → Semantic)
-```
-
-## ✨ Features
-
-- **Three-tier memory hierarchy**: Short-term → Episodic → Semantic
-- **Memory decay**: Ebbinghaus forgetting curve with importance weighting
-- **Automatic consolidation**: Memories are promoted and abstracted over time
-- **Conflict detection & resolution**: Handle contradictory information gracefully
-- **Intent-aware retrieval**: Different query types access different memory strategies
-- **Scoped contexts**: Project, user, and global memory scopes
+### Integrations
+- **LangChain Compatible**: Drop-in memory class for LangChain chains
+- **Event Hooks**: Extensible pub/sub system for memory lifecycle events
+- **RAG Support**: Memory retriever for retrieval-augmented generation
 
 ## 📦 Installation
 
 ```bash
-pip install llm-memory
-```
-
-Or from source:
-
-```bash
-git clone https://github.com/llm-memory/llm-memory.git
+# Clone the repository
+git clone https://github.com/yourusername/llm-memory.git
 cd llm-memory
+
+# Create virtual environment (Python 3.11+ recommended)
+python3.11 -m venv venv
+source venv/bin/activate
+
+# Install dependencies
 pip install -e ".[dev]"
 ```
 
 ## 🚀 Quick Start
 
 ```python
-from llm_memory import MemorySystem
+import asyncio
+from llm_memory import MemorySystem, MemoryType
 
-# Initialize memory system
-memory = MemorySystem(
-    user_id="user_123",
-    scope="project_abc"
+async def main():
+    # Initialize the memory system
+    system = MemorySystem()
+    await system.initialize()
+    
+    # Store a semantic memory (fact)
+    await system.remember(
+        "User prefers Python for data science",
+        memory_type=MemoryType.SEMANTIC,
+        tags=["preference", "language"]
+    )
+    
+    # Store an episodic memory (experience)
+    await system.remember(
+        "Debugged async database issue - solution was missing await",
+        memory_type=MemoryType.EPISODIC,
+        tags=["debugging", "async"]
+    )
+    
+    # Add conversation messages
+    await system.add_message("Hello!", role="user", session_id="chat_1")
+    await system.add_message("Hi there!", role="assistant", session_id="chat_1")
+    
+    # Recall relevant memories
+    results = await system.recall("What language does user prefer?")
+    for result in results.ranked_results:
+        print(f"- {result.result.content}")
+    
+    # Get conversation context with relevant memories
+    context = await system.get_context(
+        session_id="chat_1",
+        include_relevant=True,
+        query="programming"
+    )
+    
+    await system.close()
+
+asyncio.run(main())
+```
+
+## 🔧 Configuration
+
+```python
+from llm_memory import MemoryConfig, MemorySystem, MemorySystemConfig
+
+# Main configuration
+config = MemoryConfig(
+    decay={"half_life_hours": 24, "min_strength": 0.1},
+    consolidation={"stm_promotion_age_minutes": 30},
+    embedding={"provider": "ollama", "model": "nomic-embed-text"},
+    llm={"provider": "ollama", "model": "llama3.2"},
 )
 
-# Observe conversations (auto-extracts and stores memories)
-memory.observe("I prefer using Python for backend development", role="user")
-memory.observe("I'll use Python for this project then", role="assistant")
-
-# Recall relevant memories based on intent
-context = memory.recall(
-    query="What language should I use for the API?",
-    intent="preference",
-    limit=5
+# System configuration
+system_config = MemorySystemConfig(
+    enable_embeddings=True,
+    enable_summarization=True,
+    enable_consolidation=True,
+    enable_conflict_resolution=True,
+    auto_consolidate=True,
+    consolidation_interval_seconds=300,
 )
 
-# Memory reflection (agent reviews its memories)
-insights = memory.reflect(topic="user preferences")
+system = MemorySystem(config=config, system_config=system_config)
 ```
 
-## 🏗️ Architecture
+## 🔗 LangChain Integration
 
-### Memory Types
+```python
+from llm_memory.api.integrations.langchain import LangChainMemory, HierarchicalMemory
 
-| Type | Purpose | Decay Rate | Example |
-|------|---------|------------|---------|
-| **Short-term** | Working context | Fast (minutes) | Current conversation buffer |
-| **Episodic** | Event memories | Medium (days) | "User debugged auth issue on Monday" |
-| **Semantic** | Facts & patterns | Slow (weeks) | "User prefers async Python" |
+# Basic chat memory (drop-in replacement)
+memory = LangChainMemory(session_id="my_session")
 
-### Importance Scoring
+# With LangChain ConversationChain
+from langchain.chains import ConversationChain
+chain = ConversationChain(llm=llm, memory=memory)
 
-Memories are scored for importance based on:
-- **Emotional salience** (sentiment analysis)
-- **Novelty** (how different from existing memories)
-- **Relevance frequency** (how often retrieved)
-- **Causal significance** (affects downstream events)
-- **User feedback** (explicit importance markers)
-
-### Consolidation Pipeline
-
-```
-STM → Episodic:
-  Trigger: End of task/session OR importance threshold
-  Transform: Raw context → Structured episode with temporal tags
-  
-Episodic → Semantic:
-  Trigger: N similar episodes detected
-  Transform: Specific events → General pattern/fact
+# Hierarchical memory with long-term context
+memory = HierarchicalMemory(
+    include_semantic=True,
+    include_episodic=True,
+    max_context_memories=5,
+)
 ```
 
-## 📖 Documentation
+## 📊 Architecture
 
-- [Architecture Deep Dive](docs/architecture.md)
-- [Cognitive Foundations](docs/cognitive_foundations.md)
-- [API Reference](docs/api_reference.md)
+```
+┌─────────────────────────────────────────────────────────────┐
+│                    Memory System                             │
+├─────────────────────────────────────────────────────────────┤
+│  ┌───────────┐  ┌───────────┐  ┌───────────┐                │
+│  │   STM     │  │ Episodic  │  │ Semantic  │                │
+│  │ (Buffer)  │→→│ (Events)  │→→│ (Facts)   │                │
+│  └───────────┘  └───────────┘  └───────────┘                │
+│        ↓              ↓              ↓                       │
+│  ┌─────────────────────────────────────────┐                │
+│  │         Consolidation Pipeline          │                │
+│  │  • Promotion  • Merging  • GC           │                │
+│  └─────────────────────────────────────────┘                │
+│        ↓              ↓              ↓                       │
+│  ┌─────────────────────────────────────────┐                │
+│  │          Conflict Resolution            │                │
+│  │  • Detection  • Strategies  • Merging   │                │
+│  └─────────────────────────────────────────┘                │
+│        ↓              ↓              ↓                       │
+│  ┌─────────────────────────────────────────┐                │
+│  │        Intent-Aware Retrieval           │                │
+│  │  • Classification  • Search  • Ranking  │                │
+│  └─────────────────────────────────────────┘                │
+└─────────────────────────────────────────────────────────────┘
+```
 
 ## 🧪 Testing
 
 ```bash
 # Run all tests
-pytest
+pytest -v
 
 # Run with coverage
 pytest --cov=llm_memory --cov-report=html
 
-# Run specific test file
+# Run specific test modules
 pytest tests/test_models.py -v
+pytest tests/test_consolidation.py -v
+pytest tests/test_conflict.py -v
 ```
 
-## 🗺️ Roadmap
+## 📁 Project Structure
 
-- [x] Stage 1: Foundation & Memory Store
-- [ ] Stage 2: Memory Encoding & Decay
-- [ ] Stage 3: Consolidation Pipeline
-- [ ] Stage 4: Conflict Resolution
-- [ ] Stage 5: Intent-Aware Retrieval
-- [ ] Stage 6: Agent Integration
-- [ ] Stage 7: Evaluation & Tuning
+```
+llm_memory/
+├── models/           # Data models (STM, Episodic, Semantic)
+├── encoding/         # Embedder and Summarizer implementations
+├── decay/            # Decay functions and importance scoring
+├── consolidation/    # Promotion, merging, garbage collection
+├── conflict/         # Detection, strategies, resolution
+├── retrieval/        # Intent classification, search, ranking
+├── storage/          # SQLite and Vector storage backends
+└── api/              # MemorySystem, MemoryAPI, hooks, integrations
+
+tests/                # Comprehensive test suite
+examples/             # Usage examples
+```
+
+## 🤖 LangGraph Agent
+
+The project includes a ready-to-use LangGraph-powered agent with memory:
+
+```python
+import asyncio
+from llm_memory.agent import MemoryAgent, AgentConfig
+
+async def main():
+    # Create agent with Ollama
+    config = AgentConfig(ollama_model="llama3.2")
+    agent = MemoryAgent(config)
+    await agent.initialize()
+    
+    # Chat with memory
+    response = await agent.chat("My name is Alex and I love Python!")
+    print(response)
+    
+    response = await agent.chat("What's my name?")  # Recalls: Alex
+    print(response)
+    
+    await agent.close()
+
+asyncio.run(main())
+```
+
+### Interactive CLI
+
+```bash
+# Run the memory agent CLI
+memory-agent --model llama3.2
+
+# Or with Python
+python -m llm_memory.agent.cli --model llama3.2
+```
+
+CLI Commands:
+- `/memory` - Show memory statistics
+- `/remember <text>` - Manually store a memory
+- `/recall <query>` - Search memories
+- `/help` - Show all commands
+
+## 🎯 Use Cases
+
+- **AI Assistants**: Long-term memory for personalized interactions
+- **Copilot Systems**: Remember user preferences and project context
+- **Conversational AI**: Context-aware responses with memory recall
+- **Knowledge Management**: Structured fact storage and retrieval
+- **RAG Systems**: Memory-augmented retrieval for LLMs
+
+## 📈 Performance
+
+- 270+ passing tests
+- ~76% code coverage
+- Async-first design for high concurrency
+- In-memory caching with optional persistence
+- Efficient batch operations
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please read our contributing guidelines and submit pull requests.
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) for details.
+MIT License - see [LICENSE](LICENSE) file for details.
 
----
+## 🙏 Acknowledgments
 
-**Built with 🧠 for smarter AI agents**
+- Inspired by cognitive architecture research
+- Built with [Pydantic](https://pydantic.dev/) for data validation
+- Vector storage powered by [ChromaDB](https://www.trychroma.com/)
+- Local LLM support via [Ollama](https://ollama.ai/)

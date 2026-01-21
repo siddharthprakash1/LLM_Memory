@@ -1,279 +1,206 @@
 """
 Basic usage example for LLM Memory.
 
-This example demonstrates:
-1. Creating different memory types
-2. Memory decay behavior
-3. Basic storage operations
+Demonstrates:
+- Initializing the memory system
+- Storing different types of memories
+- Querying with intent-aware retrieval
+- Managing conversation context
+- Working with the consolidation pipeline
 """
 
 import asyncio
-from datetime import datetime, timedelta
-from pathlib import Path
-
-# Add parent to path for development
-import sys
-sys.path.insert(0, str(Path(__file__).parent.parent))
-
-from llm_memory.config import MemoryConfig, StorageConfig
-from llm_memory.models.short_term import ShortTermMemory, WorkingContext, STMRole
-from llm_memory.models.episodic import EpisodicMemory, Episode, EventType
-from llm_memory.models.semantic import SemanticMemory, Fact, FactType
-from llm_memory.storage.sqlite import SQLiteStorage
-
-
-async def demo_short_term_memory():
-    """Demonstrate short-term memory usage."""
-    print("\n" + "="*60)
-    print("SHORT-TERM MEMORY DEMO")
-    print("="*60)
-    
-    # Create a short-term memory buffer
-    stm = ShortTermMemory(
-        content="Conversation buffer",
-        session_id="session_001",
-    )
-    
-    # Add conversation messages
-    stm.add_message("How do I implement authentication?", role=STMRole.USER)
-    stm.add_message(
-        "I recommend using JWT tokens with OAuth2...",
-        role=STMRole.ASSISTANT
-    )
-    stm.add_message("Can you show me an example?", role=STMRole.USER)
-    
-    print(f"\nSTM Buffer: {len(stm)} items")
-    print(f"Memory Type: {stm.memory_type.value}")
-    print(f"Decay Rate: {stm.get_decay_rate()}")
-    
-    # Show messages
-    print("\nConversation:")
-    for item in stm.items:
-        print(f"  [{item.role.value}]: {item.content[:50]}...")
-    
-    # Demonstrate decay
-    print("\n--- Memory Decay ---")
-    ctx = stm.items[0]
-    print(f"Initial strength: {ctx.current_strength:.2f}")
-    
-    # Simulate time passing
-    ctx.last_accessed_at = datetime.utcnow() - timedelta(hours=2)
-    ctx.update_strength()
-    print(f"After 2 hours: {ctx.current_strength:.2f}")
-    
-    # Rehearsal boost
-    ctx.apply_rehearsal_boost(boost=0.3)
-    print(f"After rehearsal: {ctx.current_strength:.2f}")
-
-
-async def demo_episodic_memory():
-    """Demonstrate episodic memory usage."""
-    print("\n" + "="*60)
-    print("EPISODIC MEMORY DEMO")
-    print("="*60)
-    
-    # Create episodic memory from a debugging session
-    ep = EpisodicMemory(content="Debugging authentication issue")
-    
-    # Add episodes
-    ep.add_episode(Episode(
-        event_id="ep_001",
-        event_type=EventType.ERROR,
-        description="User reported 401 errors on API calls",
-        details={"error_code": 401, "endpoint": "/api/users"},
-        outcome="Investigated token expiration",
-        was_successful=False,
-    ))
-    
-    ep.add_episode(Episode(
-        event_id="ep_002",
-        event_type=EventType.DISCOVERY,
-        description="Found that refresh token logic was missing",
-        details={"file": "auth.py", "line": 45},
-        emotional_valence=0.6,  # Positive - found the issue!
-    ))
-    
-    ep.add_episode(Episode(
-        event_id="ep_003",
-        event_type=EventType.TASK_COMPLETION,
-        description="Implemented token refresh, tests passing",
-        outcome="Fixed authentication",
-        was_successful=True,
-    ))
-    
-    # Add lessons learned
-    ep.lessons_learned = [
-        "Always implement token refresh logic",
-        "Add tests for token expiration scenarios"
-    ]
-    
-    print(f"\nEpisodic Memory: {len(ep)} episodes")
-    print(f"Memory Type: {ep.memory_type.value}")
-    print(f"Decay Rate: {ep.get_decay_rate()}")
-    
-    print("\nEpisodes:")
-    for episode in ep.episodes:
-        status = "✓" if episode.was_successful else "✗"
-        print(f"  [{status}] {episode.event_type.value}: {episode.description[:50]}...")
-    
-    print("\nLessons Learned:")
-    for lesson in ep.lessons_learned:
-        print(f"  • {lesson}")
-
-
-async def demo_semantic_memory():
-    """Demonstrate semantic memory usage."""
-    print("\n" + "="*60)
-    print("SEMANTIC MEMORY DEMO")
-    print("="*60)
-    
-    # Create semantic memory for user preferences
-    sem = SemanticMemory(content="User preferences and knowledge")
-    
-    # Add facts
-    sem.add_fact(Fact(
-        fact_id="pref_001",
-        fact_type=FactType.PREFERENCE,
-        subject="User",
-        predicate="prefers",
-        object="Python for backend development",
-        statement="User prefers Python for backend development",
-        confidence=0.9,
-    ))
-    
-    sem.add_fact(Fact(
-        fact_id="pref_002",
-        fact_type=FactType.PREFERENCE,
-        subject="User",
-        predicate="prefers",
-        object="TypeScript for frontend",
-        statement="User prefers TypeScript for frontend development",
-        confidence=0.85,
-    ))
-    
-    sem.add_fact(Fact(
-        fact_id="cap_001",
-        fact_type=FactType.CAPABILITY,
-        subject="User",
-        predicate="knows",
-        object="PostgreSQL and Redis",
-        statement="User knows PostgreSQL and Redis for data storage",
-        confidence=0.8,
-    ))
-    
-    sem.add_fact(Fact(
-        fact_id="proc_001",
-        fact_type=FactType.PROCEDURE,
-        subject="Authentication",
-        predicate="should use",
-        object="JWT with refresh tokens",
-        statement="Authentication should use JWT with refresh tokens",
-        confidence=0.95,
-    ))
-    
-    print(f"\nSemantic Memory: {len(sem.facts)} facts")
-    print(f"Memory Type: {sem.memory_type.value}")
-    print(f"Decay Rate: {sem.get_decay_rate()}")
-    print(f"Overall Confidence: {sem.overall_confidence:.2f}")
-    
-    print("\nFacts by Type:")
-    for fact_type in [FactType.PREFERENCE, FactType.CAPABILITY, FactType.PROCEDURE]:
-        facts = sem.get_facts_by_type(fact_type)
-        print(f"\n  {fact_type.value.upper()}:")
-        for fact in facts:
-            print(f"    • {fact.statement} (confidence: {fact.confidence:.0%})")
-    
-    # Strengthen a fact (simulating repeated observation)
-    print("\n--- Strengthening Facts ---")
-    pref = sem.get_fact("pref_001")
-    print(f"Before: confidence={pref.confidence:.2f}, evidence={pref.evidence_count}")
-    
-    sem.strengthen_fact("pref_001", boost=0.05)
-    
-    pref = sem.get_fact("pref_001")
-    print(f"After:  confidence={pref.confidence:.2f}, evidence={pref.evidence_count}")
-
-
-async def demo_storage():
-    """Demonstrate storage operations."""
-    print("\n" + "="*60)
-    print("STORAGE DEMO")
-    print("="*60)
-    
-    # Configure storage with temp directory
-    config = StorageConfig(
-        sqlite_path=Path("./data/demo_memory.db")
-    )
-    
-    async with SQLiteStorage(config) as storage:
-        print(f"\nConnected to: {config.sqlite_path}")
-        
-        # Create different memory types
-        stm = ShortTermMemory(content="Demo buffer")
-        stm.add_message("Hello!", role=STMRole.USER)
-        stm.metadata.user_id = "demo_user"
-        stm.metadata.scope = "demo_project"
-        
-        ep = EpisodicMemory(content="Demo episode")
-        ep.add_episode(Episode(
-            event_id="demo_ep",
-            event_type=EventType.INTERACTION,
-            description="Demo interaction",
-        ))
-        ep.metadata.user_id = "demo_user"
-        
-        sem = SemanticMemory(content="Demo knowledge")
-        sem.add_fact(Fact(
-            fact_id="demo_fact",
-            fact_type=FactType.DEFINITION,
-            subject="Demo",
-            predicate="is",
-            object="example",
-            statement="Demo is an example",
-        ))
-        sem.metadata.user_id = "demo_user"
-        
-        # Store all memories
-        await storage.create(stm)
-        await storage.create(ep)
-        await storage.create(sem)
-        
-        print("\nCreated 3 memories")
-        
-        # Get stats
-        stats = await storage.get_stats()
-        print(f"\nStorage Statistics:")
-        print(f"  Total memories: {stats['total_memories']}")
-        for mem_type, count in stats['by_type'].items():
-            print(f"  {mem_type}: {count}")
-        
-        # Query by user
-        user_memories = await storage.query_by_user("demo_user")
-        print(f"\nMemories for demo_user: {len(user_memories)}")
-        
-        # Read back a memory
-        loaded = await storage.read(sem.id)
-        print(f"\nLoaded semantic memory:")
-        print(f"  Facts: {len(loaded.facts)}")
-        print(f"  Statement: {loaded.facts[0].statement}")
-    
-    print("\n✓ Storage demo complete!")
+from llm_memory import (
+    MemorySystem,
+    MemorySystemConfig,
+    MemoryType,
+    MemorySource,
+    EventType,
+    FactType,
+)
 
 
 async def main():
-    """Run all demos."""
-    print("\n" + "="*60)
-    print("LLM MEMORY - BASIC USAGE EXAMPLES")
-    print("="*60)
+    """Main example function."""
+    print("=" * 60)
+    print("LLM Memory - Basic Usage Example")
+    print("=" * 60)
     
-    await demo_short_term_memory()
-    await demo_episodic_memory()
-    await demo_semantic_memory()
-    await demo_storage()
+    # Initialize the memory system
+    config = MemorySystemConfig(
+        enable_embeddings=False,  # Disable for this example
+        enable_summarization=False,
+        enable_consolidation=True,
+        enable_conflict_resolution=True,
+    )
     
-    print("\n" + "="*60)
-    print("ALL DEMOS COMPLETE!")
-    print("="*60 + "\n")
+    system = MemorySystem(system_config=config)
+    await system.initialize()
+    
+    print("\n✓ Memory system initialized")
+    
+    # =========================================
+    # 1. Store Semantic Memories (Facts/Knowledge)
+    # =========================================
+    print("\n" + "-" * 40)
+    print("1. Storing Semantic Memories (Facts)")
+    print("-" * 40)
+    
+    # Store user preferences
+    pref1 = await system.remember(
+        "User prefers Python for data science projects",
+        memory_type=MemoryType.SEMANTIC,
+        tags=["preference", "language"],
+        fact_type=FactType.PREFERENCE,
+    )
+    print(f"  Stored: {pref1.content[:50]}...")
+    
+    pref2 = await system.remember(
+        "User likes dark mode in their IDE",
+        memory_type=MemoryType.SEMANTIC,
+        tags=["preference", "ui"],
+        fact_type=FactType.PREFERENCE,
+    )
+    print(f"  Stored: {pref2.content[:50]}...")
+    
+    # Store factual knowledge
+    fact1 = await system.remember(
+        "The project uses FastAPI for the backend API",
+        memory_type=MemoryType.SEMANTIC,
+        tags=["project", "tech-stack"],
+        fact_type=FactType.DEFINITION,
+    )
+    print(f"  Stored: {fact1.content[:50]}...")
+    
+    # =========================================
+    # 2. Store Episodic Memories (Experiences)
+    # =========================================
+    print("\n" + "-" * 40)
+    print("2. Storing Episodic Memories (Experiences)")
+    print("-" * 40)
+    
+    # Store a problem-solving session
+    episode1 = await system.remember(
+        "User encountered a bug with async database connections. "
+        "We debugged it together and found the issue was missing await. "
+        "Solution: Added await to the database query call.",
+        memory_type=MemoryType.EPISODIC,
+        tags=["debugging", "async", "database"],
+        event_type=EventType.ERROR,
+    )
+    print(f"  Stored: {episode1.content[:50]}...")
+    
+    # Store a decision
+    episode2 = await system.remember(
+        "User decided to use SQLAlchemy instead of raw SQL "
+        "for better maintainability and type safety.",
+        memory_type=MemoryType.EPISODIC,
+        tags=["decision", "database"],
+        event_type=EventType.DECISION,
+    )
+    print(f"  Stored: {episode2.content[:50]}...")
+    
+    # =========================================
+    # 3. Conversation Memory (Short-Term)
+    # =========================================
+    print("\n" + "-" * 40)
+    print("3. Conversation Memory (Short-Term)")
+    print("-" * 40)
+    
+    session_id = "example_session"
+    
+    # Simulate a conversation
+    await system.add_message(
+        "Can you help me with my Python project?",
+        role="user",
+        session_id=session_id,
+    )
+    print("  User: Can you help me with my Python project?")
+    
+    await system.add_message(
+        "Of course! I'd be happy to help. What do you need?",
+        role="assistant",
+        session_id=session_id,
+    )
+    print("  Assistant: Of course! I'd be happy to help...")
+    
+    await system.add_message(
+        "I need to add authentication to my FastAPI app",
+        role="user",
+        session_id=session_id,
+    )
+    print("  User: I need to add authentication...")
+    
+    # Get conversation context
+    context = await system.get_context(
+        session_id=session_id,
+        include_relevant=True,
+        query="authentication FastAPI",
+    )
+    print(f"\n  Conversation has {len(context['history'])} messages")
+    print(f"  Found {len(context['relevant_memories'])} relevant memories")
+    
+    # =========================================
+    # 4. Intent-Aware Retrieval
+    # =========================================
+    print("\n" + "-" * 40)
+    print("4. Intent-Aware Retrieval")
+    print("-" * 40)
+    
+    # Factual query
+    print("\n  Query: 'What language does the user prefer?'")
+    results = await system.recall("What language does the user prefer?")
+    print(f"  Intent: {results.intent.primary_intent.value}")
+    print(f"  Found: {len(results.ranked_results)} results")
+    if results.ranked_results:
+        print(f"  Top result: {results.ranked_results[0].result.content[:60]}...")
+    
+    # Episodic query
+    print("\n  Query: 'What happened with the database bug?'")
+    results = await system.recall("What happened with the database bug?")
+    print(f"  Intent: {results.intent.primary_intent.value}")
+    print(f"  Found: {len(results.ranked_results)} results")
+    if results.ranked_results:
+        print(f"  Top result: {results.ranked_results[0].result.content[:60]}...")
+    
+    # Procedural query
+    print("\n  Query: 'How do I set up the project?'")
+    results = await system.recall("How do I set up the project?")
+    print(f"  Intent: {results.intent.primary_intent.value}")
+    
+    # =========================================
+    # 5. System Statistics
+    # =========================================
+    print("\n" + "-" * 40)
+    print("5. System Statistics")
+    print("-" * 40)
+    
+    stats = system.get_statistics()
+    print(f"  Total memories: {stats['total_memories']}")
+    print(f"  Active sessions: {stats['active_sessions']}")
+    print(f"  By type:")
+    for mem_type, count in stats['by_type'].items():
+        print(f"    - {mem_type}: {count}")
+    
+    # =========================================
+    # 6. Consolidation
+    # =========================================
+    print("\n" + "-" * 40)
+    print("6. Memory Consolidation")
+    print("-" * 40)
+    
+    consolidation_stats = await system.consolidate()
+    print(f"  STM promoted: {consolidation_stats['stm_promoted']}")
+    print(f"  Garbage collected: {consolidation_stats['garbage_collected']}")
+    
+    # =========================================
+    # Cleanup
+    # =========================================
+    await system.close()
+    
+    print("\n" + "=" * 60)
+    print("Example completed successfully!")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

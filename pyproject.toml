@@ -56,6 +56,16 @@ langchain = [
     "langchain>=0.1.0",
     "langchain-core>=0.1.0",
 ]
+agent = [
+    "langgraph>=0.2.0",
+    "langchain>=0.2.0",
+    "langchain-core>=0.2.0",
+    "langchain-ollama>=0.1.0",
+]
+
+[project.scripts]
+memory-agent = "llm_memory.agent.cli:main"
+memory-agent-ui = "llm_memory.agent.web_ui:main"
 
 [project.urls]
 Homepage = "https://github.com/llm-memory/llm-memory"

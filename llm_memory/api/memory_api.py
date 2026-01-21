@@ -228,7 +228,7 @@ class MemoryAPI:
         """
         memory = self._memories.get(memory_id)
         
-        if memory:
+        if memory is not None:
             self._trigger_hooks("pre_retrieve", memory)
             memory.mark_accessed()
             self._trigger_hooks("post_retrieve", memory)
@@ -248,7 +248,7 @@ class MemoryAPI:
         """
         memory = self._memories.get(memory_id)
         
-        if not memory:
+        if memory is None:
             return OperationResult(
                 success=False,
                 operation=MemoryOperation.UPDATE,
@@ -284,7 +284,7 @@ class MemoryAPI:
         """
         memory = self._memories.get(memory_id)
         
-        if not memory:
+        if memory is None:
             return OperationResult(
                 success=False,
                 operation=MemoryOperation.DELETE,

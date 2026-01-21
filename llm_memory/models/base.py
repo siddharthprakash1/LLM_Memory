@@ -282,6 +282,14 @@ class BaseMemory(BaseModel, ABC):
         """Create memory from dictionary."""
         return cls.model_validate(data)
 
+    def mark_accessed(self) -> None:
+        """Mark this memory as having been accessed."""
+        self.record_access()
+
+    def __bool__(self) -> bool:
+        """Memory objects are always truthy."""
+        return True
+
     def __str__(self) -> str:
         """String representation of memory."""
         return f"{self.memory_type.value}[{self.id[:8]}]: {self.content[:50]}..."

@@ -149,7 +149,7 @@ class LangChainMemory:
             Message(
                 role="human" if item.role == STMRole.USER else "ai",
                 content=item.content,
-                timestamp=item.timestamp,
+                timestamp=item.created_at if hasattr(item, 'created_at') else _utcnow(),
             )
             for item in self._stm.items
         ]

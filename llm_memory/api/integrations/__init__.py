@@ -1,9 +1,20 @@
 """
-Integration modules for different agent frameworks.
+Framework integrations for LLM Memory.
 
-Will be implemented in Stage 6:
-- LangChain integration
-- OpenAI integration
+Provides:
+- LangChain integration for chat memory and RAG
 """
 
-__all__ = []
+from llm_memory.api.integrations.langchain import (
+    Message,
+    LangChainMemory,
+    HierarchicalMemory,
+    MemoryRetriever,
+)
+
+__all__ = [
+    "Message",
+    "LangChainMemory",
+    "HierarchicalMemory",
+    "MemoryRetriever",
+]
