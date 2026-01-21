@@ -55,7 +55,7 @@ class MemorySystemAdapter:
         if self._initialized:
             return
         
-        from llm_memory.api.memory_system import MemorySystem
+        from llm_memory.api.memory_system import MemorySystem, MemorySystemConfig
         from llm_memory.config import MemoryConfig, LLMConfig, EmbeddingConfig
         
         config = MemoryConfig(
@@ -71,36 +71,59 @@ class MemorySystemAdapter:
             ),
         )
         
-        self._memory_system = MemorySystem(config)
+        # Enable full capabilities for accurate benchmarking
+        system_config = MemorySystemConfig(
+            enable_embeddings=True,  # Enable semantic search
+            enable_summarization=False,  # Skip summarization (not needed for retrieval)
+            enable_consolidation=True,
+            enable_conflict_resolution=True,
+        )
+        
+        self._memory_system = MemorySystem(config, system_config)
         await self._memory_system.initialize()
         self._initialized = True
     
     async def store(self, content: str, metadata: dict | None = None) -> str:
         await self._ensure_initialized()
-        result = await self._memory_system.remember(
+        memory = await self._memory_system.remember(
             content=content,
             user_id="benchmark_user",
-            metadata=metadata or {},
+            tags=metadata.get("tags", []) if metadata else [],
         )
-        return result.get("memory_id", "")
+        return memory.id
     
     async def retrieve(self, query: str, limit: int = 5) -> list[dict]:
         await self._ensure_initialized()
-        results = await self._memory_system.recall(
+        ranked_results = await self._memory_system.recall(
             query=query,
             user_id="benchmark_user",
             limit=limit,
         )
-        return results
+        # Convert RankedResults to list of dicts
+        return [
+            {
+                "id": r.result.memory_id,
+                "content": r.result.content,
+                "score": r.ranking_score,
+            }
+            for r in ranked_results.ranked_results[:limit]
+        ]
     
     async def get_stats(self) -> dict:
         await self._ensure_initialized()
-        return self._memory_system.get_stats()
+        stats = self._memory_system.get_statistics()
+        return {
+            "total": stats["total_memories"],
+            "stm": stats["by_type"].get("short_term", 0),
+            "episodic": stats["by_type"].get("episodic", 0),
+            "semantic": stats["by_type"].get("semantic", 0),
+        }
     
     def clear(self) -> None:
         if self._memory_system:
-            # Reset memory system
-            self._memory_system.memory_api._memories.clear()
+            # Reset memory system's internal storage
+            self._memory_system._memories.clear()
+            self._memory_system._stm_sessions.clear()
 
 
 class SimpleMemoryBaseline:
