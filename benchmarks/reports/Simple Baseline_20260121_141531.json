@@ -1,0 +1,984 @@
+{
+  "meta": {
+    "system_name": "Simple Baseline",
+    "timestamp": "2026-01-21T14:15:31.145560",
+    "config": {
+      "scenarios": [
+        "single_hop",
+        "multi_hop",
+        "temporal"
+      ],
+      "samples_per_scenario": 20,
+      "num_runs": 1,
+      "memory_spans": [
+        10,
+        50,
+        100
+      ],
+      "store_timeout_ms": 5000,
+      "retrieve_timeout_ms": 2000,
+      "use_llm_judge": false,
+      "seed": 42
+    }
+  },
+  "aggregated": {
+    "single_hop": {
+      "num_runs": 1,
+      "accuracy": {
+        "single_hop": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 0.7,
+            "std": 0
+          },
+          "f1": {
+            "mean": 0.017142857142857144,
+            "std": 0
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 0.09728094810270707,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.05904579957132228,
+            "std": 0
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 0.06638125560129994,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.05487299968081061,
+            "std": 0
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 55.99,
+        "std": 0,
+        "min": 55.99,
+        "max": 55.99
+      }
+    },
+    "multi_hop": {
+      "num_runs": 1,
+      "accuracy": {
+        "multi_hop": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 0.2,
+            "std": 0
+          },
+          "f1": {
+            "mean": 0.0,
+            "std": 0
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 0.06398340046871452,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.04992044414393604,
+            "std": 0
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 0.067795498034684,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.058681150403572246,
+            "std": 0
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 38.99,
+        "std": 0,
+        "min": 38.99,
+        "max": 38.99
+      }
+    },
+    "temporal": {
+      "num_runs": 1,
+      "accuracy": {
+        "temporal": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 0.4,
+            "std": 0
+          },
+          "f1": {
+            "mean": 0.03784907902554961,
+            "std": 0
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 0.05811044902657159,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.04979764274875855,
+            "std": 0
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 0.06512499930977356,
+            "std": 0
+          },
+          "mean": {
+            "mean": 0.05633535001834389,
+            "std": 0
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 34.99,
+        "std": 0,
+        "min": 34.99,
+        "max": 34.99
+      }
+    }
+  },
+  "detailed_runs": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "single_hop",
+          "system_name": "Simple Baseline",
+          "run_id": "af348f78",
+          "timestamp": "2026-01-21T14:15:31.131444",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 1,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 20,
+            "mean_ms": 0.059,
+            "median_ms": 0.051,
+            "std_ms": 0.023,
+            "min_ms": 0.045,
+            "max_ms": 0.144,
+            "p50_ms": 0.051,
+            "p95_ms": 0.097,
+            "p99_ms": 0.134
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 0.055,
+            "median_ms": 0.052,
+            "std_ms": 0.008,
+            "min_ms": 0.046,
+            "max_ms": 0.078,
+            "p50_ms": 0.052,
+            "p95_ms": 0.066,
+            "p99_ms": 0.076
+          }
+        },
+        "accuracy": {
+          "single_hop": {
+            "task_type": "single_hop",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.7,
+            "f1_score": 0.0171,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 20,
+          "by_tier": {
+            "stm": 20,
+            "episodic": 0,
+            "semantic": 0
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 40,
+          "total_time_seconds": 0.002,
+          "operations_per_second": 16219.51
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "multi_hop",
+          "system_name": "Simple Baseline",
+          "run_id": "3d3577e9",
+          "timestamp": "2026-01-21T14:15:31.138206",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 1,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 45,
+            "mean_ms": 0.05,
+            "median_ms": 0.048,
+            "std_ms": 0.006,
+            "min_ms": 0.041,
+            "max_ms": 0.069,
+            "p50_ms": 0.048,
+            "p95_ms": 0.064,
+            "p99_ms": 0.068
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 0.059,
+            "median_ms": 0.059,
+            "std_ms": 0.008,
+            "min_ms": 0.046,
+            "max_ms": 0.081,
+            "p50_ms": 0.059,
+            "p95_ms": 0.068,
+            "p99_ms": 0.079
+          }
+        },
+        "accuracy": {
+          "multi_hop": {
+            "task_type": "multi_hop",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.2,
+            "f1_score": 0.0,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 45,
+          "by_tier": {
+            "stm": 45,
+            "episodic": 0,
+            "semantic": 0
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 65,
+          "total_time_seconds": 0.004,
+          "operations_per_second": 18114.68
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "temporal",
+          "system_name": "Simple Baseline",
+          "run_id": "98fada3f",
+          "timestamp": "2026-01-21T14:15:31.141996",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 1,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 42,
+            "mean_ms": 0.05,
+            "median_ms": 0.049,
+            "std_ms": 0.004,
+            "min_ms": 0.043,
+            "max_ms": 0.061,
+            "p50_ms": 0.049,
+            "p95_ms": 0.058,
+            "p99_ms": 0.061
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 0.056,
+            "median_ms": 0.055,
+            "std_ms": 0.007,
+            "min_ms": 0.047,
+            "max_ms": 0.07,
+            "p50_ms": 0.055,
+            "p95_ms": 0.065,
+            "p99_ms": 0.069
+          }
+        },
+        "accuracy": {
+          "temporal": {
+            "task_type": "temporal",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.4,
+            "f1_score": 0.0378,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 42,
+          "by_tier": {
+            "stm": 42,
+            "episodic": 0,
+            "semantic": 0
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 62,
+          "total_time_seconds": 0.003,
+          "operations_per_second": 18189.82
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    }
+  ],
+  "sample_results": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "single_hop_0000",
+          "query": "Where do I work?",
+          "expected": "Meta",
+          "retrieved": "I work at Meta.",
+          "num_results": 1,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0001",
+          "query": "What is my favorite color?",
+          "expected": "pink",
+          "retrieved": "My favorite color is pink. I work at Meta.",
+          "num_results": 2,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0002",
+          "query": "What is my pet's name?",
+          "expected": "Buddy",
+          "retrieved": "My favorite color is pink. I work at Meta. I have a dog named Buddy.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0003",
+          "query": "Where did I graduate from?",
+          "expected": "Oxford",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 4,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0004",
+          "query": "How old am I?",
+          "expected": "42",
+          "retrieved": "I am 42 years old. I work at Meta. My favorite color is pink.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0005",
+          "query": "What car do I drive?",
+          "expected": "black BMW",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "single_hop_0006",
+          "query": "What is my email address?",
+          "expected": "frank@example.com",
+          "retrieved": "My email is frank@example.com. My favorite color is pink. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0007",
+          "query": "Where do I live?",
+          "expected": "Singapore",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "single_hop_0008",
+          "query": "What is my name?",
+          "expected": "Bob",
+          "retrieved": "My favorite color is pink. My email is frank@example.com. My name is Bob.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0009",
+          "query": "What is my phone number?",
+          "expected": "+1-555-612-3927",
+          "retrieved": "My phone number is +1-555-612-3927. My favorite color is pink. My email is frank@example.com.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0010",
+          "query": "What is my phone number?",
+          "expected": "+1-555-600-1319",
+          "retrieved": "My phone number is +1-555-612-3927. My phone number is +1-555-600-1319. My favorite color is pink.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0011",
+          "query": "How old am I?",
+          "expected": "30",
+          "retrieved": "I am 42 years old. I am 30 years old. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0012",
+          "query": "What is my phone number?",
+          "expected": "+1-555-629-8397",
+          "retrieved": "My phone number is +1-555-612-3927. My phone number is +1-555-600-1319. My phone number is +1-555-629-8397.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0013",
+          "query": "What is my favorite color?",
+          "expected": "teal",
+          "retrieved": "My favorite color is pink. My favorite color is teal. My email is frank@example.com.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0014",
+          "query": "What is my name?",
+          "expected": "Frank",
+          "retrieved": "My favorite color is pink. My email is frank@example.com. My name is Bob.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0015",
+          "query": "Where do I work?",
+          "expected": "Tesla",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "single_hop_0016",
+          "query": "What is my favorite color?",
+          "expected": "green",
+          "retrieved": "My favorite color is pink. My favorite color is teal. My favorite color is green.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0017",
+          "query": "Where do I work?",
+          "expected": "Anthropic",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "single_hop_0018",
+          "query": "What is my pet's name?",
+          "expected": "Coco",
+          "retrieved": "My favorite color is pink. My email is frank@example.com. My name is Bob.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "single_hop_0019",
+          "query": "What car do I drive?",
+          "expected": "black Tesla",
+          "retrieved": "I work at Meta. I have a dog named Buddy. I graduated from Oxford.",
+          "num_results": 5,
+          "success": false
+        }
+      ]
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "multi_hop_0000",
+          "query": "In which city does my friend Sarah work?",
+          "expected": "Austin",
+          "retrieved": "My friend Sarah works at CloudSoft. CloudSoft is headquartered in Austin.",
+          "num_results": 2,
+          "success": true
+        },
+        {
+          "sample_id": "multi_hop_0001",
+          "query": "In which city does my friend Mike work?",
+          "expected": "Chicago",
+          "retrieved": "My friend Mike works at DataInc. My friend Sarah works at CloudSoft. CloudSoft is headquartered in Austin.",
+          "num_results": 4,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0002",
+          "query": "What landmark is near where my sister Sophie lives?",
+          "expected": "Freedom Trail",
+          "retrieved": "My sister Sophie lives in Denver. My friend Sarah works at CloudSoft. CloudSoft is headquartered in Austin.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0003",
+          "query": "What landmark is near where my sister Emily lives?",
+          "expected": "Red Rocks",
+          "retrieved": "My sister Emily lives in Boston. My sister Sophie lives in Denver. My friend Sarah works at CloudSoft.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0004",
+          "query": "What landmark is near where my sister Emily lives?",
+          "expected": "Capitol Building",
+          "retrieved": "My sister Emily lives in Boston. My sister Emily lives in Seattle. My sister Sophie lives in Denver.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0005",
+          "query": "What landmark is near where my sister Mia lives?",
+          "expected": "Capitol Building",
+          "retrieved": "My sister Mia lives in Boston. My sister Sophie lives in Denver. My sister Emily lives in Boston.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0006",
+          "query": "What is the capital of the country where my German teacher is from?",
+          "expected": "Paris",
+          "retrieved": "Spain's capital is Paris. My friend Sarah works at CloudSoft. CloudSoft is headquartered in Austin.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "multi_hop_0007",
+          "query": "What landmark is near where my sister Sophie lives?",
+          "expected": "Capitol Building",
+          "retrieved": "My sister Sophie lives in Denver. My sister Sophie lives in Denver. My sister Emily lives in Boston.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0008",
+          "query": "What is the capital of the country where my Spanish teacher is from?",
+          "expected": "Paris",
+          "retrieved": "Spain's capital is Paris. France's capital is Paris. My friend Sarah works at CloudSoft.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "multi_hop_0009",
+          "query": "What is the capital of the country where my Spanish teacher is from?",
+          "expected": "Tokyo",
+          "retrieved": "Spain's capital is Paris. France's capital is Paris. China's capital is Tokyo.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "multi_hop_0010",
+          "query": "What landmark is near where my sister Anna lives?",
+          "expected": "Bean",
+          "retrieved": "My sister Anna lives in Denver. My sister Sophie lives in Denver. My sister Emily lives in Boston.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0011",
+          "query": "Who owns the store where I bought my headphones?",
+          "expected": "Sundar",
+          "retrieved": "I bought a headphones from TechMart. My friend Sarah works at CloudSoft. My friend Mike works at DataInc.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0012",
+          "query": "Who owns the store where I bought my laptop?",
+          "expected": "Mark",
+          "retrieved": "I bought a headphones from TechMart. I bought a laptop from TechMart. My friend Sarah works at CloudSoft.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0013",
+          "query": "Who owns the store where I bought my watch?",
+          "expected": "Sundar",
+          "retrieved": "I bought a headphones from TechMart. I bought a laptop from TechMart. I bought a watch from ElectroShop.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0014",
+          "query": "What is the capital of the country where my French teacher is from?",
+          "expected": "Madrid",
+          "retrieved": "Spain's capital is Paris. France's capital is Paris. China's capital is Tokyo.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0015",
+          "query": "In which city does my friend Sarah work?",
+          "expected": "Seattle",
+          "retrieved": "My friend Sarah works at CloudSoft. My friend Sarah works at DataInc. My friend Mike works at DataInc.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0016",
+          "query": "Who owns the store where I bought my phone?",
+          "expected": "Mark",
+          "retrieved": "I bought a headphones from TechMart. I bought a laptop from TechMart. I bought a watch from ElectroShop.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0017",
+          "query": "What is the capital of the country where my French teacher is from?",
+          "expected": "Berlin",
+          "retrieved": "Spain's capital is Paris. France's capital is Paris. China's capital is Tokyo.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0018",
+          "query": "Who owns the store where I bought my watch?",
+          "expected": "Jeff",
+          "retrieved": "I bought a headphones from TechMart. I bought a laptop from TechMart. I bought a watch from ElectroShop.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "multi_hop_0019",
+          "query": "In which city does my friend Mike work?",
+          "expected": "Denver",
+          "retrieved": "My friend Mike works at DataInc. My friend Mike works at DataInc. My friend Sarah works at CloudSoft.",
+          "num_results": 5,
+          "success": false
+        }
+      ]
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "temporal_0000",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash.",
+          "num_results": 2,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0001",
+          "query": "Where did I live before moving to New York?",
+          "expected": "Seattle",
+          "retrieved": "I moved to New York. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 4,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0002",
+          "query": "Where did I live before moving to Houston?",
+          "expected": "Phoenix",
+          "retrieved": "I moved to New York. I moved to Houston. I just started reading Snow Crash.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0003",
+          "query": "Where do I currently work?",
+          "expected": "Amazon",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0004",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0005",
+          "query": "What book am I currently reading?",
+          "expected": "1984",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0006",
+          "query": "Where did I live before moving to Seattle?",
+          "expected": "New York",
+          "retrieved": "I moved to New York. I moved to Houston. I moved to Seattle.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0007",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0008",
+          "query": "What place did I visit after Rome but before Singapore?",
+          "expected": "Barcelona",
+          "retrieved": "I just started reading Snow Crash. I lived in Seattle for 2 years. I moved to New York.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0009",
+          "query": "Where did I live before moving to Los Angeles?",
+          "expected": "Houston",
+          "retrieved": "I moved to Los Angeles. I moved to New York. I moved to Houston.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0010",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0011",
+          "query": "What book am I currently reading?",
+          "expected": "Foundation",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0012",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "Seattle",
+          "retrieved": "I moved to New York. I moved to Houston. I moved to Seattle.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0013",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0014",
+          "query": "Where did I live before moving to Los Angeles?",
+          "expected": "Houston",
+          "retrieved": "I moved to Los Angeles. I moved to Los Angeles. I moved to New York.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0015",
+          "query": "Where did I live before moving to New York?",
+          "expected": "Los Angeles",
+          "retrieved": "I moved to New York. I moved to New York. I moved to Houston.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0016",
+          "query": "What place did I visit after Tokyo but before Rome?",
+          "expected": "Barcelona",
+          "retrieved": "I just started reading Snow Crash. I lived in Seattle for 2 years. I moved to New York.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0017",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0018",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I'm currently reading Neuromancer. I just started reading Snow Crash. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0019",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "Houston",
+          "retrieved": "I moved to New York. I moved to Houston. I moved to Seattle.",
+          "num_results": 5,
+          "success": true
+        }
+      ]
+    }
+  ]
+}

@@ -66,6 +66,7 @@ agent = [
 [project.scripts]
 memory-agent = "llm_memory.agent.cli:main"
 memory-agent-ui = "llm_memory.agent.web_ui:main"
+memory-benchmark = "benchmarks.benchmark_memory:cli_main"
 
 [project.urls]
 Homepage = "https://github.com/siddharthprakash1/LLM_Memory"
