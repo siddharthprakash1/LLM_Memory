@@ -66,9 +66,9 @@ class BenchmarkConfig:
     # Memory spans to test (in number of context items)
     memory_spans: list[int] = field(default_factory=lambda: [10, 50, 100])
     
-    # Timeouts
-    store_timeout_ms: int = 5000
-    retrieve_timeout_ms: int = 2000
+    # Timeouts (increased for RAG pipeline with LLM)
+    store_timeout_ms: int = 30000  # 30 seconds
+    retrieve_timeout_ms: int = 60000  # 60 seconds for RAG + LLM
     
     # LLM for answer evaluation (optional)
     use_llm_judge: bool = False

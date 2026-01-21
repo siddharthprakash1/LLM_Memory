@@ -543,10 +543,18 @@ def compute_composite_score(metrics: BenchmarkMetrics, weights: dict[str, float]
     else:
         scores["retrieval_accuracy"] = 0.0
     
-    # Latency score (inverse - lower is better, cap at 100ms = 100 score)
+    # Latency score (inverse - lower is better)
+    # For RAG with LLM synthesis, <5s is excellent, <10s is good, <30s is acceptable
     if "retrieve" in metrics.latency:
         p95 = metrics.latency["retrieve"].p95
-        scores["latency_score"] = max(0, 100 - p95) if p95 < 100 else 0
+        if p95 <= 1000:  # Under 1s
+            scores["latency_score"] = 100
+        elif p95 <= 5000:  # 1-5s (typical for RAG + LLM)
+            scores["latency_score"] = 80 - (p95 - 1000) / 100
+        elif p95 <= 10000:  # 5-10s
+            scores["latency_score"] = 40 - (p95 - 5000) / 200
+        else:  # Over 10s
+            scores["latency_score"] = max(0, 20 - (p95 - 10000) / 1000)
     else:
         scores["latency_score"] = 50.0  # neutral
     

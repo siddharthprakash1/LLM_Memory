@@ -1,0 +1,1791 @@
+{
+  "meta": {
+    "system_name": "LLM-Memory (gemma3:27b)",
+    "timestamp": "2026-01-21T15:38:46.386664",
+    "config": {
+      "scenarios": [
+        "single_hop",
+        "temporal",
+        "conflict"
+      ],
+      "samples_per_scenario": 20,
+      "num_runs": 2,
+      "memory_spans": [
+        10,
+        50,
+        100
+      ],
+      "store_timeout_ms": 30000,
+      "retrieve_timeout_ms": 60000,
+      "use_llm_judge": false,
+      "seed": 42
+    }
+  },
+  "aggregated": {
+    "single_hop": {
+      "num_runs": 2,
+      "accuracy": {
+        "single_hop": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 1.0,
+            "std": 0.0
+          },
+          "f1": {
+            "mean": 0.19329254079254082,
+            "std": 0.0071958652124744825
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 98.7062605721805,
+            "std": 34.774739373310865
+          },
+          "mean": {
+            "mean": 72.39236049899773,
+            "std": 21.539076566011715
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 4826.22275847316,
+            "std": 909.5647965586977
+          },
+          "mean": {
+            "mean": 3127.070537399595,
+            "std": 126.76999186699753
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 45.0,
+        "std": 0.0,
+        "min": 45.0,
+        "max": 45.0
+      }
+    },
+    "temporal": {
+      "num_runs": 2,
+      "accuracy": {
+        "temporal": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 0.8,
+            "std": 0.0
+          },
+          "f1": {
+            "mean": 0.08832410177556355,
+            "std": 0.0012844162579859467
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 74.35022989848221,
+            "std": 4.209102192825885
+          },
+          "mean": {
+            "mean": 48.811239084890204,
+            "std": 1.548015420633117
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 6782.88147377807,
+            "std": 159.6005896550655
+          },
+          "mean": {
+            "mean": 4844.660445849877,
+            "std": 105.56354115918512
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 15.0,
+        "std": 0.0,
+        "min": 15.0,
+        "max": 15.0
+      }
+    },
+    "conflict": {
+      "num_runs": 2,
+      "accuracy": {
+        "conflict": {
+          "exact_match": {
+            "mean": 0.0,
+            "std": 0.0,
+            "min": 0.0,
+            "max": 0.0
+          },
+          "contains_match": {
+            "mean": 0.575,
+            "std": 0.03535533905932733
+          },
+          "f1": {
+            "mean": 0.0620088081723152,
+            "std": 0.006751684987711453
+          }
+        }
+      },
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 80.80241057705278,
+            "std": 3.718359083121753
+          },
+          "mean": {
+            "mean": 50.50413389953974,
+            "std": 0.19767979682637837
+          }
+        },
+        "retrieve": {
+          "p95": {
+            "mean": 9189.268455902311,
+            "std": 858.9654013529698
+          },
+          "mean": {
+            "mean": 5509.261862425046,
+            "std": 151.79863435172652
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 15.0,
+        "std": 0.0,
+        "min": 15.0,
+        "max": 15.0
+      }
+    }
+  },
+  "detailed_runs": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "single_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "f45e8e76",
+          "timestamp": "2026-01-21T15:29:36.036355",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 20,
+            "mean_ms": 87.623,
+            "median_ms": 59.418,
+            "std_ms": 111.999,
+            "min_ms": 48.787,
+            "max_ms": 560.599,
+            "p50_ms": 59.418,
+            "p95_ms": 123.296,
+            "p99_ms": 473.138
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 3216.71,
+            "median_ms": 3442.658,
+            "std_ms": 1475.153,
+            "min_ms": 1534.429,
+            "max_ms": 7325.547,
+            "p50_ms": 3442.658,
+            "p95_ms": 5469.382,
+            "p99_ms": 6954.314
+          }
+        },
+        "accuracy": {
+          "single_hop": {
+            "task_type": "single_hop",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 1.0,
+            "f1_score": 0.1882,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 20,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 20
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 40,
+          "total_time_seconds": 66.089,
+          "operations_per_second": 0.61
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "single_hop",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "single_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "f0b213f6",
+          "timestamp": "2026-01-21T15:30:42.135804",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 20,
+            "mean_ms": 57.162,
+            "median_ms": 54.772,
+            "std_ms": 9.29,
+            "min_ms": 48.362,
+            "max_ms": 86.085,
+            "p50_ms": 54.772,
+            "p95_ms": 74.117,
+            "p99_ms": 83.691
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 3037.431,
+            "median_ms": 3075.104,
+            "std_ms": 866.094,
+            "min_ms": 1520.154,
+            "max_ms": 4369.376,
+            "p50_ms": 3075.104,
+            "p95_ms": 4183.063,
+            "p99_ms": 4332.114
+          }
+        },
+        "accuracy": {
+          "single_hop": {
+            "task_type": "single_hop",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 1.0,
+            "f1_score": 0.1984,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 20,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 20
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 40,
+          "total_time_seconds": 61.893,
+          "operations_per_second": 0.65
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "temporal",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "2964d365",
+          "timestamp": "2026-01-21T15:31:44.029144",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 42,
+            "mean_ms": 49.906,
+            "median_ms": 41.888,
+            "std_ms": 20.612,
+            "min_ms": 22.091,
+            "max_ms": 128.712,
+            "p50_ms": 41.888,
+            "p95_ms": 77.327,
+            "p99_ms": 112.123
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 4919.305,
+            "median_ms": 5271.959,
+            "std_ms": 1531.333,
+            "min_ms": 1683.289,
+            "max_ms": 6792.276,
+            "p50_ms": 5271.959,
+            "p95_ms": 6670.027,
+            "p99_ms": 6767.826
+          }
+        },
+        "accuracy": {
+          "temporal": {
+            "task_type": "temporal",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.8,
+            "f1_score": 0.0892,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 42,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 42
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 62,
+          "total_time_seconds": 100.484,
+          "operations_per_second": 0.62
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "temporal",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "584d3973",
+          "timestamp": "2026-01-21T15:33:24.515278",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 43,
+            "mean_ms": 47.717,
+            "median_ms": 43.792,
+            "std_ms": 14.74,
+            "min_ms": 24.951,
+            "max_ms": 79.786,
+            "p50_ms": 43.792,
+            "p95_ms": 71.374,
+            "p99_ms": 78.271
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 4770.016,
+            "median_ms": 5013.769,
+            "std_ms": 1600.035,
+            "min_ms": 1598.526,
+            "max_ms": 6923.346,
+            "p50_ms": 5013.769,
+            "p95_ms": 6895.736,
+            "p99_ms": 6917.824
+          }
+        },
+        "accuracy": {
+          "temporal": {
+            "task_type": "temporal",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.8,
+            "f1_score": 0.0874,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 43,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 43
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 63,
+          "total_time_seconds": 97.454,
+          "operations_per_second": 0.65
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "conflict",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "83236be3",
+          "timestamp": "2026-01-21T15:35:01.970982",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 40,
+            "mean_ms": 50.644,
+            "median_ms": 47.39,
+            "std_ms": 16.62,
+            "min_ms": 26.996,
+            "max_ms": 93.375,
+            "p50_ms": 47.39,
+            "p95_ms": 78.173,
+            "p99_ms": 89.735
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 5616.6,
+            "median_ms": 5028.465,
+            "std_ms": 2458.424,
+            "min_ms": 2446.501,
+            "max_ms": 12413.978,
+            "p50_ms": 5028.465,
+            "p95_ms": 9796.649,
+            "p99_ms": 11890.512
+          }
+        },
+        "accuracy": {
+          "conflict": {
+            "task_type": "conflict",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.6,
+            "f1_score": 0.0668,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 40,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 40
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 60,
+          "total_time_seconds": 114.36,
+          "operations_per_second": 0.52
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "conflict",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "7dde973f",
+          "timestamp": "2026-01-21T15:36:56.331347",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 20,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 30000,
+            "retrieve_timeout_ms": 60000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 40,
+            "mean_ms": 50.364,
+            "median_ms": 47.262,
+            "std_ms": 17.2,
+            "min_ms": 28.536,
+            "max_ms": 102.676,
+            "p50_ms": 47.262,
+            "p95_ms": 83.432,
+            "p99_ms": 96.513
+          },
+          "retrieve": {
+            "operation": "retrieve",
+            "count": 20,
+            "mean_ms": 5401.924,
+            "median_ms": 5260.131,
+            "std_ms": 1610.717,
+            "min_ms": 2621.963,
+            "max_ms": 8619.182,
+            "p50_ms": 5260.131,
+            "p95_ms": 8581.888,
+            "p99_ms": 8611.723
+          }
+        },
+        "accuracy": {
+          "conflict": {
+            "task_type": "conflict",
+            "num_samples": 20,
+            "exact_match": 0.0,
+            "contains_match": 0.55,
+            "f1_score": 0.0572,
+            "mean_score": null
+          }
+        },
+        "memory": {
+          "total_memories": 40,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 40
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 60,
+          "total_time_seconds": 110.055,
+          "operations_per_second": 0.55
+        }
+      },
+      "errors": [],
+      "sample_count": 20
+    }
+  ],
+  "sample_results": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "single_hop_0000",
+          "query": "Where do I work?",
+          "expected": "Meta",
+          "retrieved": "You work at Meta [1]. I work at Meta.",
+          "num_results": 2,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0001",
+          "query": "What is my favorite color?",
+          "expected": "pink",
+          "retrieved": "My favorite color is pink [1]. My favorite color is pink. I work at Meta.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0002",
+          "query": "What is my pet's name?",
+          "expected": "Buddy",
+          "retrieved": "Buddy [1]. I have a dog named Buddy. My favorite color is pink.",
+          "num_results": 4,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0003",
+          "query": "Where did I graduate from?",
+          "expected": "Oxford",
+          "retrieved": "Oxford [1]. I graduated from Oxford. I work at Meta.",
+          "num_results": 4,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0004",
+          "query": "How old am I?",
+          "expected": "42",
+          "retrieved": "I am 42 years old [1]. I am 42 years old. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0005",
+          "query": "What car do I drive?",
+          "expected": "black BMW",
+          "retrieved": "I drive a black BMW [1]. I drive a black BMW. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0006",
+          "query": "What is my email address?",
+          "expected": "frank@example.com",
+          "retrieved": "My email address is frank@example.com [1]. My email is frank@example.com. My favorite color is pink.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0007",
+          "query": "Where do I live?",
+          "expected": "Singapore",
+          "retrieved": "I live in Singapore [1]. I live in Singapore. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0008",
+          "query": "What is my name?",
+          "expected": "Bob",
+          "retrieved": "My name is Bob [1]. My name is Bob. I have a dog named Buddy.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0009",
+          "query": "What is my phone number?",
+          "expected": "+1-555-612-3927",
+          "retrieved": "My phone number is +1-555-612-3927 [1]. My phone number is +1-555-612-3927. My name is Bob.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0010",
+          "query": "What is my phone number?",
+          "expected": "+1-555-600-1319",
+          "retrieved": "My phone number is +1-555-600-1319 [1] and +1-555-612-3927 [2]. My phone number is +1-555-600-1319. My phone number is +1-555-612-3927.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0011",
+          "query": "How old am I?",
+          "expected": "30",
+          "retrieved": "I am 30 years old [1] and 42 years old [2]. I am 30 years old. I am 42 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0012",
+          "query": "What is my phone number?",
+          "expected": "+1-555-629-8397",
+          "retrieved": "My phone number is +1-555-600-1319 [1], +1-555-629-8397 [2], and +1-555-612-3927 [3]. My phone number is +1-555-600-1319. My phone number is +1-555-629-8397.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0013",
+          "query": "What is my favorite color?",
+          "expected": "teal",
+          "retrieved": "My favorite color is pink [1] and teal [2]. My favorite color is pink. My favorite color is teal.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0014",
+          "query": "What is my name?",
+          "expected": "Frank",
+          "retrieved": "My name is Frank [1] and also Bob [2]. My name is Frank. My name is Bob.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0015",
+          "query": "Where do I work?",
+          "expected": "Tesla",
+          "retrieved": "I work at Tesla [1] and Meta [2]. I work at Tesla. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0016",
+          "query": "What is my favorite color?",
+          "expected": "green",
+          "retrieved": "My favorite color is pink [1], teal [2], and green [3]. My favorite color is pink. My favorite color is teal.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0017",
+          "query": "Where do I work?",
+          "expected": "Anthropic",
+          "retrieved": "I work at Anthropic [1], Tesla [2], and Meta [3]. I work at Anthropic. I work at Tesla.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0018",
+          "query": "What is my pet's name?",
+          "expected": "Coco",
+          "retrieved": "My pets are named Buddy [3] and Coco [4]. My name is Frank. My name is Bob.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0019",
+          "query": "What car do I drive?",
+          "expected": "black Tesla",
+          "retrieved": "I drive a black Tesla [1] and a black BMW [2]. I drive a black Tesla. I drive a black BMW.",
+          "num_results": 5,
+          "success": true
+        }
+      ]
+    },
+    {
+      "scenario": "single_hop",
+      "run_id": 1,
+      "samples": [
+        {
+          "sample_id": "single_hop_0000",
+          "query": "What is my name?",
+          "expected": "Eve",
+          "retrieved": "Your name is Eve [1]. My name is Eve.",
+          "num_results": 2,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0001",
+          "query": "What is my phone number?",
+          "expected": "+1-555-264-9395",
+          "retrieved": "My phone number is +1-555-264-9395 [1]. My phone number is +1-555-264-9395. My name is Eve.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0002",
+          "query": "What is my pet's name?",
+          "expected": "Max",
+          "retrieved": "Max [2]. My name is Eve. I have a dog named Max.",
+          "num_results": 4,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0003",
+          "query": "How old am I?",
+          "expected": "29",
+          "retrieved": "I am 29 years old [1]. I am 29 years old. My name is Eve.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0004",
+          "query": "Where do I live?",
+          "expected": "New York",
+          "retrieved": "I live in New York [1]. I live in New York. I have a dog named Max.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0005",
+          "query": "What is my name?",
+          "expected": "Henry",
+          "retrieved": "My name is Henry [1] and Eve [2]. My name is Henry. My name is Eve.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0006",
+          "query": "What car do I drive?",
+          "expected": "silver Chevrolet",
+          "retrieved": "I drive a silver Chevrolet [1]. I drive a silver Chevrolet. I have a dog named Max.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0007",
+          "query": "Where did I graduate from?",
+          "expected": "Yale",
+          "retrieved": "Yale [1]. I graduated from Yale. I have a dog named Max.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0008",
+          "query": "What is my email address?",
+          "expected": "alice@example.com",
+          "retrieved": "My email address is alice@example.com [1]. My email is alice@example.com. My name is Henry.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0009",
+          "query": "What is my pet's name?",
+          "expected": "Max",
+          "retrieved": "My pet's name is Max [3, 4]. My name is Henry. My name is Eve.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0010",
+          "query": "Where do I live?",
+          "expected": "London",
+          "retrieved": "I live in London [1] and New York [2]. I live in London. I live in New York.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0011",
+          "query": "What is my name?",
+          "expected": "Charlie",
+          "retrieved": "My name is Charlie [1], Henry [2], and Eve [3]. My name is Charlie. My name is Henry.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0012",
+          "query": "What is my name?",
+          "expected": "Bob",
+          "retrieved": "My name is Bob [1], Charlie [2], Henry [3], and Eve [4]. My name is Bob. My name is Charlie.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0013",
+          "query": "Where do I live?",
+          "expected": "Toronto",
+          "retrieved": "I live in Toronto [1], London [2], and New York [3]. I live in Toronto. I live in London.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0014",
+          "query": "What car do I drive?",
+          "expected": "blue Chevrolet",
+          "retrieved": "I drive both a silver Chevrolet [1] and a blue Chevrolet [2]. I drive a silver Chevrolet. I drive a blue Chevrolet.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0015",
+          "query": "What is my pet's name?",
+          "expected": "Charlie",
+          "retrieved": "My pet's name is Max [5, 6] and Charlie [8]. My name is Bob. My name is Charlie.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0016",
+          "query": "What is my email address?",
+          "expected": "diana@example.com",
+          "retrieved": "My email address is diana@example.com [1] or alice@example.com [2]. My email is diana@example.com. My email is alice@example.com.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0017",
+          "query": "What car do I drive?",
+          "expected": "silver BMW",
+          "retrieved": "I drive a silver BMW [1] and a silver Chevrolet [2], and a blue Chevrolet [3]. I drive a silver BMW. I drive a silver Chevrolet.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0018",
+          "query": "Where did I graduate from?",
+          "expected": "Stanford",
+          "retrieved": "I graduated from Stanford [1] and Yale [2]. I graduated from Stanford. I graduated from Yale.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "single_hop_0019",
+          "query": "How old am I?",
+          "expected": "27",
+          "retrieved": "I am 29 years old [1] or 27 years old [2]. I am 29 years old. I am 27 years old.",
+          "num_results": 5,
+          "success": true
+        }
+      ]
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "temporal_0000",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "Neuromancer [1]. I'm currently reading Neuromancer. I just started reading Snow Crash.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0001",
+          "query": "Where did I live before moving to New York?",
+          "expected": "Seattle",
+          "retrieved": "Seattle [2]. I moved to New York. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0002",
+          "query": "Where did I live before moving to Houston?",
+          "expected": "Phoenix",
+          "retrieved": "I don't have that information. The provided information only states you moved to Houston [1] and New York [2], and lived in Phoenix [3] and Seattle [4], but doesn't specify the order before Houston. I moved to Houston. I moved to New York.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0003",
+          "query": "Where do I currently work?",
+          "expected": "Amazon",
+          "retrieved": "I currently work at Amazon [2]. I work at Meta. I just got a new job at Amazon.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0004",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I currently work at Meta [2, 3, 4]. However, there is conflicting information as I also work at Netflix [1] and Amazon [4]. I work at Netflix. I work at Meta.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0005",
+          "query": "What book am I currently reading?",
+          "expected": "1984",
+          "retrieved": "I am currently reading Snow Crash [1, 3] and Neuromancer [2]. I also just started reading 1984 [10]. I'm currently reading Snow Crash. I'm currently reading Neuromancer.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0006",
+          "query": "Where did I live before moving to Seattle?",
+          "expected": "New York",
+          "retrieved": "I lived in Phoenix [4] and Houston [2] before living in Seattle [5]. I moved to Seattle. I moved to Houston.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0007",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I currently work at Amazon [7]. While I previously worked at Netflix [1, 2] and Meta [3, 5, 6], my most recent job is at Amazon. I work at Netflix. I work at Netflix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0008",
+          "query": "What place did I visit after Rome but before Singapore?",
+          "expected": "Barcelona",
+          "retrieved": "Barcelona [2]. I visited Rome. I traveled to Barcelona.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0009",
+          "query": "Where did I live before moving to Los Angeles?",
+          "expected": "Houston",
+          "retrieved": "I lived in New York, Seattle, and Houston before moving to Los Angeles [1, 2, 3, 4]. I moved to Los Angeles. I moved to New York.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0010",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "I am currently reading The Martian [1], Snow Crash [2, 4, 5], and Neuromancer [3]. I also just started reading 1984 [19]. I'm currently reading The Martian. I'm currently reading Snow Crash.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0011",
+          "query": "What book am I currently reading?",
+          "expected": "Foundation",
+          "retrieved": "I am currently reading The Martian [1, 2], Snow Crash [3, 5, 6], and Neuromancer [4]. I also just started reading Foundation [7]. I'm currently reading The Martian. I'm currently reading The Martian.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0012",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "Seattle",
+          "retrieved": "I don't have that information. The provided information only states I moved *to* Chicago [1], but not where I lived before that. I moved to Chicago. I moved to Seattle.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0013",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "I am currently reading The Martian [1, 2], Snow Crash [3, 6, 7, 8], Foundation [4, 9], and Neuromancer [5]. I'm currently reading The Martian. I'm currently reading The Martian.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0014",
+          "query": "Where did I live before moving to Los Angeles?",
+          "expected": "Houston",
+          "retrieved": "I lived in New York [3], Chicago [4], Seattle [5], Houston [6], Phoenix [11]. I don't have information specifying *which* city I lived in immediately before Los Angeles. I moved to Los Angeles. I moved to Los Angeles.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0015",
+          "query": "Where did I live before moving to New York?",
+          "expected": "Los Angeles",
+          "retrieved": "I don't have that information. The provided information only states I *moved to* New York [1, 2], but doesn't mention where I lived prior to that move. I moved to New York. I moved to New York.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0016",
+          "query": "What place did I visit after Tokyo but before Rome?",
+          "expected": "Barcelona",
+          "retrieved": "I don't have that information. While I know I visited Tokyo [1] and Rome [2], the provided information doesn\u2019t specify what I visited *between* those two cities. I visited Tokyo. I visited Rome.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0017",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I currently work at Meta [4, 8, 9, 10] and Amazon [1, 11]. I work at Amazon. I work at Netflix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0018",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I currently work at Meta [5, 9, 10, 11, 12] and Amazon [2, 13]. I also previously worked at Microsoft [1], Netflix [3, 4]. I work at Microsoft. I work at Amazon.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0019",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "Houston",
+          "retrieved": "I don't have that information. The provided memories only state I moved *to* Chicago [1, 2], but not where I lived beforehand. I moved to Chicago. I moved to Chicago.",
+          "num_results": 5,
+          "success": false
+        }
+      ]
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 1,
+      "samples": [
+        {
+          "sample_id": "temporal_0000",
+          "query": "What book am I currently reading?",
+          "expected": "1984",
+          "retrieved": "The Martian [1]. I'm currently reading The Martian. I just started reading 1984.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0001",
+          "query": "What book am I currently reading?",
+          "expected": "Foundation",
+          "retrieved": "You are currently reading Snow Crash [1] and The Martian [2]. You also just started reading Foundation [3] and 1984 [4]. I'm currently reading Snow Crash. I'm currently reading The Martian.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0002",
+          "query": "What book am I currently reading?",
+          "expected": "Foundation",
+          "retrieved": "You are currently reading Snow Crash [1], The Martian [2], and 1984 [5]. I'm currently reading Snow Crash. I'm currently reading The Martian.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0003",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "Seattle",
+          "retrieved": "Seattle [2]. I moved to Chicago. I lived in Seattle for 2 years.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0004",
+          "query": "Where do I currently work?",
+          "expected": "Microsoft",
+          "retrieved": "I currently work at Microsoft [4]. While I previously worked at Amazon [1], my most recent information states I am at Microsoft. I work at Amazon. I'm currently reading Snow Crash.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0005",
+          "query": "Where did I live before moving to Phoenix?",
+          "expected": "Los Angeles",
+          "retrieved": "I lived in Chicago [2], Seattle [3], and Los Angeles [4] before moving to Phoenix [1]. I moved to Phoenix. I moved to Chicago.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0006",
+          "query": "What place did I visit after Sydney but before Barcelona?",
+          "expected": "Singapore",
+          "retrieved": "Singapore [1, 2, 3]. I visited Sydney. I traveled to Singapore.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0007",
+          "query": "Where do I currently work?",
+          "expected": "Amazon",
+          "retrieved": "I currently work at Amazon [2, 5, 6]. However, there is conflicting information as I also work at Netflix [1]. I work at Netflix. I work at Amazon.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0008",
+          "query": "What book am I currently reading?",
+          "expected": "1984",
+          "retrieved": "You are currently reading Snow Crash [1], The Martian [2], Dune [3], and 1984 [7, 16, 17]. You also just started reading Foundation [4, 5]. I'm currently reading Snow Crash. I'm currently reading The Martian.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0009",
+          "query": "What place did I visit after Singapore but before London?",
+          "expected": "Dubai",
+          "retrieved": "Sydney [2] and Dubai [3]. I visited Singapore. I visited Sydney.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0010",
+          "query": "Where did I live before moving to Chicago?",
+          "expected": "New York",
+          "retrieved": "I lived in Seattle, New York, and Los Angeles for 2 years each before moving to Chicago [6, 7, 8, 1, 3]. I also lived in Phoenix [2]. I moved to Chicago. I moved to Phoenix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0011",
+          "query": "Where do I currently work?",
+          "expected": "Meta",
+          "retrieved": "I currently work at Meta [6] and Amazon [7, 8]. I also previously worked at Microsoft [1] and Netflix [2]. I work at Microsoft. I work at Netflix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0012",
+          "query": "Where do I currently work?",
+          "expected": "Apple",
+          "retrieved": "I currently work at Amazon [1, 4, 9], Microsoft [2, 10], Netflix [3], Apple [7], and Meta [8]. I work at Amazon. I work at Microsoft.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0013",
+          "query": "What book am I currently reading?",
+          "expected": "Foundation",
+          "retrieved": "You are currently reading Snow Crash [1, 2], The Martian [3], Dune [4], and 1984 [10]. You also just started reading Foundation [5, 6, 7]. I'm currently reading Snow Crash. I'm currently reading Snow Crash.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0014",
+          "query": "Where did I live before moving to Seattle?",
+          "expected": "New York",
+          "retrieved": "I don't have that information. While I know you lived in Seattle [7], the provided information doesn\u2019t state where you lived *before* moving there. I moved to Seattle. I moved to Chicago.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0015",
+          "query": "Where do I currently work?",
+          "expected": "Netflix",
+          "retrieved": "I currently work at Meta [11]. While I previously worked at Amazon [1, 2, 5, 12], Microsoft [3, 13], and Netflix [4, 9], my most recent job is at Meta. I work at Amazon. I work at Amazon.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0016",
+          "query": "What place did I visit after Barcelona but before Paris?",
+          "expected": "Sydney",
+          "retrieved": "Singapore [2], [6]. I visited Barcelona [1], [9], then Singapore, and then Paris [7]. I visited Barcelona. I visited Singapore.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "temporal_0017",
+          "query": "Where do I currently work?",
+          "expected": "Google",
+          "retrieved": "I currently work at Meta [13], but have previously worked at Microsoft [1, 4, 15], Amazon [2, 3, 6, 14], Google [10], and Netflix [5, 11]. I work at Microsoft. I work at Amazon.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0018",
+          "query": "What book am I currently reading?",
+          "expected": "Snow Crash",
+          "retrieved": "You are currently reading Dune, 1984, The Martian, and Snow Crash [1, 2, 3, 4, 5, 13]. I'm currently reading The Martian. I'm currently reading Snow Crash.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "temporal_0019",
+          "query": "What book am I currently reading?",
+          "expected": "Neuromancer",
+          "retrieved": "You are currently reading 1984 [15], The Martian [1, 4], Snow Crash [2, 3, 7], Foundation [5, 9, 10, 11], and Dune [6]. I'm currently reading The Martian. I'm currently reading Snow Crash.",
+          "num_results": 5,
+          "success": false
+        }
+      ]
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 0,
+      "samples": [
+        {
+          "sample_id": "conflict_0000",
+          "query": "Do I like steak?",
+          "expected": "yes",
+          "retrieved": "Initially, you hated steak [1], but you've recently begun to enjoy it [2]. I hate steak. It's disgusting. I've started to really enjoy steak lately.",
+          "num_results": 3,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0001",
+          "query": "What is my favorite movie?",
+          "expected": "Inception",
+          "retrieved": "My favorite movie is either Interstellar [1] or Inception [2]. I think my favorite movie is Interstellar. Actually, Inception might be my favorite.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0002",
+          "query": "What is my favorite movie?",
+          "expected": "Pulp Fiction",
+          "retrieved": "My favorite movie is likely Pulp Fiction [4], though I\u2019ve also considered Inception [1, 3] and Interstellar [2]. I think my favorite movie is Inception. I think my favorite movie is Interstellar.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0003",
+          "query": "How old am I?",
+          "expected": "25",
+          "retrieved": "I am both 40 [1] and 25 [2] years old. I am 40 years old. I am 25 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0004",
+          "query": "Do I like sushi?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated sushi [1], but I\u2019ve started to enjoy it lately [2]. I hate sushi. It's disgusting. I've started to really enjoy sushi lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0005",
+          "query": "What is my favorite movie?",
+          "expected": "Fight Club",
+          "retrieved": "My favorite movie is likely Pulp Fiction [6], though I\u2019ve also expressed preferences for Interstellar [1, 3], Inception [2, 4], and Fight Club [5]. My preference seems to change. I think my favorite movie is Interstellar. I think my favorite movie is Inception.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0006",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-338-9279",
+          "retrieved": "My current phone number is +1-555-338-9279 [2]. My phone number is +1-555-350-4657. I changed my number. It's now +1-555-338-9279.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0007",
+          "query": "What is my favorite movie?",
+          "expected": "Interstellar",
+          "retrieved": "My favorite movie is likely either *Fight Club*, *Interstellar*, or *Inception*, with a recent leaning towards *Pulp Fiction* [1, 2, 3, 4, 5, 6, 7, 8]. My preference seems to change. I think my favorite movie is Fight Club. I think my favorite movie is Interstellar.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0008",
+          "query": "Do I like pizza?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated pizza [1], but I\u2019ve started to enjoy it lately [2]. I hate pizza. It's disgusting. I've started to really enjoy pizza lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0009",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-132-1488",
+          "retrieved": "My current phone number is +1-555-132-1488 [4]. My phone number is +1-555-350-4657. My phone number is +1-555-195-4582.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0010",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-716-1434",
+          "retrieved": "My current phone number is +1-555-716-1434 [6]. My phone number is +1-555-350-4657. My phone number is +1-555-338-9279.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0011",
+          "query": "What is my favorite movie?",
+          "expected": "Inception",
+          "retrieved": "My favorite movie is likely either *Inception* or *Interstellar* [6, 7, 8]. I\u2019ve also expressed preferences for *Pulp Fiction* [1, 10] and *Fight Club* [2, 9], but later seemed to lean towards *Inception* or *Interstellar*. I think my favorite movie is Pulp Fiction. I think my favorite movie is Fight Club.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0012",
+          "query": "How old am I?",
+          "expected": "36",
+          "retrieved": "I am 40 [1], 30 [2], 36 [3], and 25 [4] years old. I am 40 years old. I am 30 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0013",
+          "query": "What is my favorite movie?",
+          "expected": "Fight Club",
+          "retrieved": "My favorite movie appears to be either *Inception*, *Interstellar*, *Fight Club*, or *Pulp Fiction* [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]. I am indecisive and have changed my mind multiple times. I think my favorite movie is Pulp Fiction. I think my favorite movie is Fight Club.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0014",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-132-1488",
+          "retrieved": "My current phone number is +1-555-716-1434 [8]. My phone number is +1-555-350-4657. My phone number is +1-555-338-9279.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0015",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-792-9935",
+          "retrieved": "My current phone number is +1-555-716-1434 [9]. My phone number is +1-555-350-4657. My phone number is +1-555-338-9279.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0016",
+          "query": "Do I like pasta?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated pasta [1], but I\u2019ve started to enjoy it lately [2]. I hate pasta. It's disgusting. I've started to really enjoy pasta lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0017",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-189-7912",
+          "retrieved": "My current phone number is +1-555-716-1434 [10]. My phone number is +1-555-350-4657. My phone number is +1-555-338-9279.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0018",
+          "query": "Do I like pizza?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated pizza [1, 2], but I\u2019ve started to enjoy it lately [3, 4]. I hate pizza. It's disgusting. I hate pizza. It's disgusting.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0019",
+          "query": "What is my favorite movie?",
+          "expected": "The Godfather",
+          "retrieved": "My favorite movie appears to be a matter of ongoing debate. Initially, I stated preferences for *The Matrix* [1], *Pulp Fiction* [2], *Fight Club* [3], and *Inception* [4, 6, 10] and *Interstellar* [5, 7, 9]. Later, I also considered *The Godfather* [11] and *Fight Club* [12, 13], and *Pulp Fiction* [14]. Ultimately, it's unclear which I definitively prefer. I think my favorite movie is The Matrix. I think my favorite movie is Pulp Fiction.",
+          "num_results": 5,
+          "success": true
+        }
+      ]
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 1,
+      "samples": [
+        {
+          "sample_id": "conflict_0000",
+          "query": "What is my favorite movie?",
+          "expected": "The Matrix",
+          "retrieved": "You are torn between two movies: Pulp Fiction [1] and The Matrix [2]. You state both are potential favorites. I think my favorite movie is Pulp Fiction. Actually, The Matrix might be my favorite.",
+          "num_results": 3,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0001",
+          "query": "Do I like pizza?",
+          "expected": "yes",
+          "retrieved": "You initially hated pizza [1], but have recently started to enjoy it [2]. I hate pizza. It's disgusting. I've started to really enjoy pizza lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0002",
+          "query": "What is my favorite movie?",
+          "expected": "Inception",
+          "retrieved": "My favorite movie is likely The Matrix or Inception, as I've expressed preference for both [1], [3], [4]. I also stated Pulp Fiction was my favorite [2]. I think my favorite movie is The Matrix. I think my favorite movie is Pulp Fiction.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0003",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-812-3358",
+          "retrieved": "My current phone number is +1-555-812-3358 [2]. My phone number is +1-555-739-9961. I changed my number. It's now +1-555-812-3358.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0004",
+          "query": "What is my favorite movie?",
+          "expected": "Fight Club",
+          "retrieved": "My favorite movie is debated. Initially, it was The Matrix [1, 2, 6], then Pulp Fiction [3], Inception [4], and Fight Club [5]. I think my favorite movie is The Matrix. I think my favorite movie is The Matrix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0005",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-723-1313",
+          "retrieved": "+1-555-723-1313 [4] My phone number is +1-555-564-9163. My phone number is +1-555-739-9961.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0006",
+          "query": "How old am I?",
+          "expected": "30",
+          "retrieved": "I am 30 years old [1] and I am 26 years old [2]. I am 30 years old. I am 26 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0007",
+          "query": "What is my favorite movie?",
+          "expected": "Inception",
+          "retrieved": "My favorite movie appears to be shifting. Initially, it was *The Matrix* [1, 2, 3, 8], then *Pulp Fiction* [4], *Inception* [5, 6], and *Fight Club* [7]. I think my favorite movie is The Matrix. I think my favorite movie is The Matrix.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0008",
+          "query": "Do I like sushi?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated sushi [1], but I\u2019ve started to enjoy it lately [2]. I hate sushi. It's disgusting. I've started to really enjoy sushi lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0009",
+          "query": "Do I like curry?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated curry [1], but I\u2019ve started to really enjoy it lately [2]. I hate curry. It's disgusting. I've started to really enjoy curry lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0010",
+          "query": "How old am I?",
+          "expected": "30",
+          "retrieved": "Based on the provided information, my age is inconsistent. I have stated I am 30 years old [1, 2], 41 years old [3], and 26 years old [4]. I am 30 years old. I am 30 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0011",
+          "query": "How old am I?",
+          "expected": "36",
+          "retrieved": "I am variously 30 [1, 2], 41 [3], 36 [4], and 26 [5, 6] years old. I am 30 years old. I am 30 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0012",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-626-8084",
+          "retrieved": "My current phone number is +1-555-812-3358 [5]. My phone number is +1-555-564-9163. My phone number is +1-555-739-9961.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0013",
+          "query": "Do I like curry?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated curry [1, 2], but I\u2019ve started to really enjoy it lately [3, 4]. I hate curry. It's disgusting. I hate curry. It's disgusting.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0014",
+          "query": "Do I like pasta?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated pasta [1], but I\u2019ve started to enjoy it lately [2]. I hate pasta. It's disgusting. I've started to really enjoy pasta lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0015",
+          "query": "How old am I?",
+          "expected": "25",
+          "retrieved": "Based on the provided information, my age varies. I have stated I am 30 [1, 2], 41 [3], 36 [4], 25 [5], and 26 [6, 7, 8] years old. I am 30 years old. I am 30 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0016",
+          "query": "How old am I?",
+          "expected": "30",
+          "retrieved": "Based on the provided information, my age varies. I have stated I am 30 [1, 2, 3], 41 [4], 36 [5, 6], 25 [7], and 26 [8, 9, 10] years old. I am 30 years old. I am 30 years old.",
+          "num_results": 5,
+          "success": true
+        },
+        {
+          "sample_id": "conflict_0017",
+          "query": "Do I like tacos?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated tacos [1], but I\u2019ve started to really enjoy them lately [2]. I hate tacos. It's disgusting. I've started to really enjoy tacos lately.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0018",
+          "query": "Do I like sushi?",
+          "expected": "yes",
+          "retrieved": "Initially, I hated sushi [1, 2], but I\u2019ve started to really enjoy it lately [3, 4]. I hate sushi. It's disgusting. I hate sushi. It's disgusting.",
+          "num_results": 5,
+          "success": false
+        },
+        {
+          "sample_id": "conflict_0019",
+          "query": "What is my current phone number?",
+          "expected": "+1-555-573-7060",
+          "retrieved": "My current phone number is +1-555-812-3358 [6]. My phone number is +1-555-564-9163. My phone number is +1-555-739-9961.",
+          "num_results": 5,
+          "success": false
+        }
+      ]
+    }
+  ]
+}

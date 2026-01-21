@@ -1,0 +1,1071 @@
+{
+  "meta": {
+    "system_name": "LLM-Memory (gemma3:27b)",
+    "timestamp": "2026-01-21T15:26:21.588807",
+    "config": {
+      "scenarios": [
+        "single_hop",
+        "multi_hop",
+        "temporal",
+        "conflict"
+      ],
+      "samples_per_scenario": 30,
+      "num_runs": 2,
+      "memory_spans": [
+        10,
+        50,
+        100
+      ],
+      "store_timeout_ms": 5000,
+      "retrieve_timeout_ms": 2000,
+      "use_llm_judge": false,
+      "seed": 42
+    }
+  },
+  "aggregated": {
+    "single_hop": {
+      "num_runs": 2,
+      "accuracy": {},
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 24.66992615081835,
+            "std": 0.7818763211081825
+          },
+          "mean": {
+            "mean": 60.818330566932374,
+            "std": 59.84176533562745
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "multi_hop": {
+      "num_runs": 2,
+      "accuracy": {},
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 22.267184375959914,
+            "std": 6.04149823984049
+          },
+          "mean": {
+            "mean": 17.29321388338576,
+            "std": 0.8848655300889363
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "temporal": {
+      "num_runs": 2,
+      "accuracy": {},
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 20.390701175165304,
+            "std": 0.2674236442873971
+          },
+          "mean": {
+            "mean": 16.95999365001626,
+            "std": 0.003516890232949411
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    },
+    "conflict": {
+      "num_runs": 2,
+      "accuracy": {},
+      "latency": {
+        "store": {
+          "p95": {
+            "mean": 22.897150278913607,
+            "std": 3.7623945153479
+          },
+          "mean": {
+            "mean": 16.3050673174439,
+            "std": 1.9702067450561351
+          }
+        }
+      },
+      "composite_score": {
+        "mean": 25.0,
+        "std": 0.0,
+        "min": 25.0,
+        "max": 25.0
+      }
+    }
+  },
+  "detailed_runs": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "single_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "c44020ab",
+          "timestamp": "2026-01-21T15:26:14.865168",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 103.133,
+            "median_ms": 16.104,
+            "std_ms": 472.489,
+            "min_ms": 12.993,
+            "max_ms": 2604.722,
+            "p50_ms": 16.104,
+            "p95_ms": 25.223,
+            "p99_ms": 1857.111
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 3.097,
+          "operations_per_second": 9.69
+        }
+      },
+      "errors": [
+        "Sample single_hop_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "single_hop",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "single_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "a3ea33a1",
+          "timestamp": "2026-01-21T15:26:17.981172",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 18.504,
+            "median_ms": 17.722,
+            "std_ms": 3.591,
+            "min_ms": 13.167,
+            "max_ms": 28.243,
+            "p50_ms": 17.722,
+            "p95_ms": 24.117,
+            "p99_ms": 27.211
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.557,
+          "operations_per_second": 53.9
+        }
+      },
+      "errors": [
+        "Sample single_hop_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample single_hop_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "multi_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "71373164",
+          "timestamp": "2026-01-21T15:26:18.537993",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 17.919,
+            "median_ms": 16.776,
+            "std_ms": 3.498,
+            "min_ms": 14.073,
+            "max_ms": 28.282,
+            "p50_ms": 16.776,
+            "p95_ms": 26.539,
+            "p99_ms": 27.984
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.539,
+          "operations_per_second": 55.65
+        }
+      },
+      "errors": [
+        "Sample multi_hop_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "multi_hop",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "3259f72e",
+          "timestamp": "2026-01-21T15:26:19.077422",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 16.668,
+            "median_ms": 16.598,
+            "std_ms": 0.697,
+            "min_ms": 15.52,
+            "max_ms": 18.168,
+            "p50_ms": 16.598,
+            "p95_ms": 17.995,
+            "p99_ms": 18.129
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.502,
+          "operations_per_second": 59.77
+        }
+      },
+      "errors": [
+        "Sample multi_hop_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample multi_hop_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "temporal",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "d1292437",
+          "timestamp": "2026-01-21T15:26:19.580097",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 16.958,
+            "median_ms": 16.732,
+            "std_ms": 2.219,
+            "min_ms": 12.797,
+            "max_ms": 21.111,
+            "p50_ms": 16.732,
+            "p95_ms": 20.58,
+            "p99_ms": 21.062
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.511,
+          "operations_per_second": 58.68
+        }
+      },
+      "errors": [
+        "Sample temporal_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "temporal",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "e71f3769",
+          "timestamp": "2026-01-21T15:26:20.092134",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 16.962,
+            "median_ms": 16.594,
+            "std_ms": 1.987,
+            "min_ms": 12.982,
+            "max_ms": 20.422,
+            "p50_ms": 16.594,
+            "p95_ms": 20.202,
+            "p99_ms": 20.405
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.512,
+          "operations_per_second": 58.6
+        }
+      },
+      "errors": [
+        "Sample temporal_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample temporal_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 0,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "conflict",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "fe637b82",
+          "timestamp": "2026-01-21T15:26:20.604832",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 17.698,
+            "median_ms": 17.478,
+            "std_ms": 1.512,
+            "min_ms": 15.21,
+            "max_ms": 21.206,
+            "p50_ms": 17.478,
+            "p95_ms": 20.237,
+            "p99_ms": 20.975
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.533,
+          "operations_per_second": 56.26
+        }
+      },
+      "errors": [
+        "Sample conflict_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 1,
+      "metrics": {
+        "meta": {
+          "benchmark_name": "conflict",
+          "system_name": "LLM-Memory (gemma3:27b)",
+          "run_id": "2f08b498",
+          "timestamp": "2026-01-21T15:26:21.138810",
+          "config": {
+            "scenarios": [
+              "single_hop",
+              "multi_hop",
+              "temporal",
+              "conflict"
+            ],
+            "samples_per_scenario": 30,
+            "num_runs": 2,
+            "memory_spans": [
+              10,
+              50,
+              100
+            ],
+            "store_timeout_ms": 5000,
+            "retrieve_timeout_ms": 2000,
+            "use_llm_judge": false,
+            "seed": 42
+          }
+        },
+        "latency": {
+          "store": {
+            "operation": "store",
+            "count": 30,
+            "mean_ms": 14.912,
+            "median_ms": 12.927,
+            "std_ms": 5.368,
+            "min_ms": 10.145,
+            "max_ms": 33.682,
+            "p50_ms": 12.927,
+            "p95_ms": 25.558,
+            "p99_ms": 31.934
+          }
+        },
+        "accuracy": {},
+        "memory": {
+          "total_memories": 30,
+          "by_tier": {
+            "stm": 0,
+            "episodic": 0,
+            "semantic": 30
+          },
+          "storage": {
+            "total_mb": 0.0,
+            "embedding_bytes": 0,
+            "metadata_bytes": 0
+          },
+          "tokens": {
+            "input_total": 0,
+            "output_total": 0,
+            "context_used": 0
+          },
+          "compression": {
+            "original_history_tokens": 0,
+            "compressed_memory_tokens": 0,
+            "compression_ratio": 0.0,
+            "token_efficiency": 0.0
+          }
+        },
+        "forgetting": {
+          "retrieval_by_age": {},
+          "mean_strength_decay": 0.0,
+          "forgetting_curve_slope": 0.0,
+          "num_tracked_memories": 0
+        },
+        "throughput": {
+          "total_operations": 30,
+          "total_time_seconds": 0.449,
+          "operations_per_second": 66.77
+        }
+      },
+      "errors": [
+        "Sample conflict_0000: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0001: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0002: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0003: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0004: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0005: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0006: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0007: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0008: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0009: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0010: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0011: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0012: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0013: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0014: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0015: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0016: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0017: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0018: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0019: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0020: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0021: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0022: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0023: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0024: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0025: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0026: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0027: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0028: 'SemanticMemory' object has no attribute 'embedding'",
+        "Sample conflict_0029: 'SemanticMemory' object has no attribute 'embedding'"
+      ],
+      "sample_count": 0
+    }
+  ],
+  "sample_results": [
+    {
+      "scenario": "single_hop",
+      "run_id": 0,
+      "samples": []
+    },
+    {
+      "scenario": "single_hop",
+      "run_id": 1,
+      "samples": []
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 0,
+      "samples": []
+    },
+    {
+      "scenario": "multi_hop",
+      "run_id": 1,
+      "samples": []
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 0,
+      "samples": []
+    },
+    {
+      "scenario": "temporal",
+      "run_id": 1,
+      "samples": []
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 0,
+      "samples": []
+    },
+    {
+      "scenario": "conflict",
+      "run_id": 1,
+      "samples": []
+    }
+  ]
+}

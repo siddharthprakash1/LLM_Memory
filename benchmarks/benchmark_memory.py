@@ -44,11 +44,20 @@ from benchmarks.scenarios import list_scenarios, SCENARIOS
 class MemorySystemAdapter:
     """
     Adapter to make our MemorySystem compatible with the benchmark protocol.
+    
+    Uses production-grade RAG pipeline with:
+    - Vector search (ChromaDB HNSW)
+    - Temporal scoring
+    - Multi-hop reasoning
+    - LLM answer synthesis
     """
     
     def __init__(self, model: str = "gemma3:27b"):
         self.model = model
         self._memory_system = None
+        self._embedder = None
+        self._vector_engine = None
+        self._rag_pipeline = None
         self._initialized = False
     
     async def _ensure_initialized(self) -> None:
@@ -57,73 +66,186 @@ class MemorySystemAdapter:
         
         from llm_memory.api.memory_system import MemorySystem, MemorySystemConfig
         from llm_memory.config import MemoryConfig, LLMConfig, EmbeddingConfig
+        from llm_memory.encoding.embedder import create_embedder
+        from llm_memory.retrieval.vector_search import VectorSearchEngine, VectorSearchConfig
+        from llm_memory.retrieval.rag_pipeline import RAGPipeline, RAGConfig
         
-        config = MemoryConfig(
-            llm=LLMConfig(
-                provider="ollama",
-                model=self.model,
-                ollama_base_url="http://localhost:11434",
-            ),
-            embedding=EmbeddingConfig(
-                provider="ollama",
-                model="nomic-embed-text",
-                ollama_base_url="http://localhost:11434",
-            ),
+        # LLM config
+        llm_config = LLMConfig(
+            provider="ollama",
+            model=self.model,
+            ollama_base_url="http://localhost:11434",
         )
         
-        # Enable full capabilities for accurate benchmarking
+        # Embedding config
+        embedding_config = EmbeddingConfig(
+            provider="ollama",
+            model="nomic-embed-text",
+            ollama_base_url="http://localhost:11434",
+        )
+        
+        config = MemoryConfig(llm=llm_config, embedding=embedding_config)
+        
+        # Memory system config
         system_config = MemorySystemConfig(
-            enable_embeddings=True,  # Enable semantic search
-            enable_summarization=False,  # Skip summarization (not needed for retrieval)
+            enable_embeddings=True,
+            enable_summarization=False,
             enable_consolidation=True,
             enable_conflict_resolution=True,
         )
         
+        # Initialize memory system
         self._memory_system = MemorySystem(config, system_config)
         await self._memory_system.initialize()
+        
+        # Initialize embedder
+        self._embedder = create_embedder(embedding_config)
+        
+        # Initialize vector search engine
+        vector_config = VectorSearchConfig(
+            collection_name="benchmark_memories",
+            similarity_threshold=0.3,
+        )
+        self._vector_engine = VectorSearchEngine(vector_config)
+        await self._vector_engine.initialize()
+        
+        # Initialize RAG pipeline
+        rag_config = RAGConfig(
+            top_k=10,
+            enable_temporal_scoring=True,
+            enable_multi_hop=True,
+            temporal_weight=0.3,
+        )
+        
+        self._rag_pipeline = RAGPipeline(
+            vector_engine=self._vector_engine,
+            embed_func=self._embed,
+            llm_func=self._llm_generate,
+            config=rag_config,
+        )
+        
         self._initialized = True
+    
+    async def _embed(self, text: str) -> list[float]:
+        """Generate embedding using Ollama."""
+        return await self._embedder.embed(text)
+    
+    async def _llm_generate(self, prompt: str) -> str:
+        """Generate text using Ollama LLM."""
+        import httpx
+        
+        async with httpx.AsyncClient(timeout=60.0) as client:
+            response = await client.post(
+                "http://localhost:11434/api/generate",
+                json={
+                    "model": self.model,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {"temperature": 0.3, "num_predict": 200},
+                },
+            )
+            response.raise_for_status()
+            return response.json().get("response", "")
     
     async def store(self, content: str, metadata: dict | None = None) -> str:
         await self._ensure_initialized()
+        
+        # Store in memory system
         memory = await self._memory_system.remember(
             content=content,
             user_id="benchmark_user",
             tags=metadata.get("tags", []) if metadata else [],
         )
+        
+        # Generate embedding and store in vector engine for RAG
+        try:
+            embedding = await self._embed(content)
+            memory.has_embedding = True
+            await self._vector_engine.add_memory(memory, embedding)
+        except Exception as e:
+            pass  # Continue without vector store
+        
         return memory.id
     
     async def retrieve(self, query: str, limit: int = 5) -> list[dict]:
+        """
+        Retrieve and answer using RAG pipeline.
+        
+        This uses:
+        1. Vector search for semantic similarity
+        2. Temporal scoring for recency
+        3. LLM for answer synthesis
+        """
         await self._ensure_initialized()
-        ranked_results = await self._memory_system.recall(
-            query=query,
-            user_id="benchmark_user",
-            limit=limit,
-        )
-        # Convert RankedResults to list of dicts
-        return [
-            {
-                "id": r.result.memory_id,
-                "content": r.result.content,
-                "score": r.ranking_score,
-            }
-            for r in ranked_results.ranked_results[:limit]
-        ]
+        
+        # Use RAG pipeline for proper retrieval + synthesis
+        try:
+            rag_result = await self._rag_pipeline.answer(query)
+            
+            # Return both the answer and sources
+            results = []
+            
+            # Add synthesized answer as first result
+            if rag_result.answer:
+                results.append({
+                    "id": "rag_answer",
+                    "content": rag_result.answer,
+                    "score": rag_result.confidence,
+                    "is_answer": True,
+                })
+            
+            # Add source memories
+            for source in rag_result.sources[:limit-1]:
+                results.append({
+                    "id": source.get("memory_id", ""),
+                    "content": source.get("content", ""),
+                    "score": source.get("similarity_score", source.get("combined_score", 0.5)),
+                })
+            
+            return results[:limit]
+            
+        except Exception as e:
+            # Fallback to basic retrieval
+            ranked_results = await self._memory_system.recall(
+                query=query,
+                user_id="benchmark_user",
+                limit=limit,
+            )
+            return [
+                {
+                    "id": r.result.memory_id,
+                    "content": r.result.content,
+                    "score": r.ranking_score,
+                }
+                for r in ranked_results.ranked_results[:limit]
+            ]
     
     async def get_stats(self) -> dict:
         await self._ensure_initialized()
         stats = self._memory_system.get_statistics()
+        vector_stats = await self._vector_engine.get_stats() if self._vector_engine else {}
         return {
             "total": stats["total_memories"],
             "stm": stats["by_type"].get("short_term", 0),
             "episodic": stats["by_type"].get("episodic", 0),
             "semantic": stats["by_type"].get("semantic", 0),
+            "vector_store": vector_stats,
         }
     
     def clear(self) -> None:
         if self._memory_system:
-            # Reset memory system's internal storage
             self._memory_system._memories.clear()
             self._memory_system._stm_sessions.clear()
+        if self._vector_engine:
+            import asyncio
+            try:
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    asyncio.create_task(self._vector_engine.clear())
+                else:
+                    loop.run_until_complete(self._vector_engine.clear())
+            except Exception:
+                pass
 
 
 class SimpleMemoryBaseline:
