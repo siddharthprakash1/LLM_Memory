@@ -1,0 +1,20 @@
+{
+  "overall_accuracy": 0.6,
+  "total_questions": 15,
+  "correct": 9,
+  "by_category": {
+    "multi-hop": {
+      "total": 5,
+      "correct": 1
+    },
+    "temporal": {
+      "total": 5,
+      "correct": 5
+    },
+    "single-hop": {
+      "total": 5,
+      "correct": 3
+    }
+  },
+  "model": "gemma3:27b"
+}

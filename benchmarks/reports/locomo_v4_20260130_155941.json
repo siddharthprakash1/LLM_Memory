@@ -1,0 +1,427 @@
+{
+  "version": "v4",
+  "model": "ollama/qwen2.5:32b",
+  "overall_f1": 0.22780098838542867,
+  "overall_em": 0.04,
+  "total_questions": 50,
+  "total_time_s": 704.1953620910645,
+  "by_category": {
+    "single-hop": {
+      "f1": 0.12941403281960562,
+      "em": 0.0,
+      "count": 19
+    },
+    "temporal": {
+      "f1": 0.36547619047619045,
+      "em": 0.08333333333333333,
+      "count": 24
+    },
+    "multi-hop": {
+      "f1": 0.022822032038621903,
+      "em": 0.0,
+      "count": 7
+    }
+  },
+  "results": [
+    {
+      "question": "When did Caroline go to the LGBTQ support group?",
+      "ground_truth": "7 May 2023",
+      "prediction": "8 May, 2023",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie paint a sunrise?",
+      "ground_truth": "2022",
+      "prediction": "8 May, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certifi",
+      "prediction": "the conversations and addition",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What did Caroline research?",
+      "ground_truth": "Adoption agencies",
+      "prediction": "Not specified in the facts pro",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's identity?",
+      "ground_truth": "Transgender woman",
+      "prediction": "Not specified",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Melanie run a charity race?",
+      "ground_truth": "The sunday before 25 May 2023",
+      "prediction": "20 May 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Melanie planning on going camping?",
+      "ground_truth": "June 2023",
+      "prediction": "The provided information does ",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What is Caroline's relationship status?",
+      "ground_truth": "Single",
+      "prediction": "Not specified",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Caroline give a speech at a school?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "9 June, 2023",
+      "f1": 0.7499999999999999,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline meet up with her friends, family, and mentors?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "No specific date is mentioned ",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Jon has lost his job as a banker?",
+      "ground_truth": "19 January, 2023",
+      "prediction": "20 January 2023",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Gina has lost her job at Door Dash?",
+      "ground_truth": "January, 2023",
+      "prediction": "January 2023",
+      "f1": 1.0,
+      "em": true,
+      "category": "temporal"
+    },
+    {
+      "question": "What do Jon and Gina both have in common?",
+      "ground_truth": "They lost their jobs and decid",
+      "prediction": "dancing",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What Jon thinks the ideal dance studio should look like?",
+      "ground_truth": "By the water, with natural lig",
+      "prediction": "near the water, with Marley fl",
+      "f1": 0.6153846153846154,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When is Jon's group performing at a festival?",
+      "ground_truth": "February, 2023",
+      "prediction": "25 April, 2023",
+      "f1": 0.4,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina launch an ad campaign for her store?",
+      "ground_truth": "29 January, 2023",
+      "prediction": "29 January, 2023",
+      "f1": 1.0,
+      "em": true,
+      "category": "temporal"
+    },
+    {
+      "question": "When was Jon in Paris?",
+      "ground_truth": "28 January 2023",
+      "prediction": "The provided facts and convers",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "Which city have both Jean and John visited?",
+      "ground_truth": "Rome",
+      "prediction": "The provided facts do not ment",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Gina team up with a local artist for some cool designs?",
+      "ground_truth": "February, 2023",
+      "prediction": "8 February, 2023",
+      "f1": 0.8,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina get her tattoo?",
+      "ground_truth": "A few years ago",
+      "prediction": "8 February, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "Who did Maria have dinner with on May 3, 2023?",
+      "ground_truth": "her mother",
+      "prediction": "The provided conversations do ",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Maria donate her car?",
+      "ground_truth": "21 December 2022",
+      "prediction": "22 December, 2022",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What martial arts has John done?",
+      "ground_truth": "Kickboxing, Taekwondo",
+      "prediction": "The provided facts do not spec",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What type of volunteering have John and Maria both done?",
+      "ground_truth": "Volunteering at a homeless she",
+      "prediction": "Maria has volunteered at a hom",
+      "f1": 0.47058823529411764,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did John join the online support group?",
+      "ground_truth": "The week before 1 January 2023",
+      "prediction": "1 January 2023",
+      "f1": 0.7499999999999999,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Maria go to the beach?",
+      "ground_truth": "December 2022",
+      "prediction": "25 May 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "Where has Maria made friends?",
+      "ground_truth": "homeless shelter, gym, church",
+      "prediction": "volunteering",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What items des John mention having as a child?",
+      "ground_truth": "A doll, a film camera",
+      "prediction": "The provided facts do not ment",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What might John's financial status be?",
+      "ground_truth": "Middle-class or wealthy",
+      "prediction": "the given information, there a",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Who gave Maria's family money when she was younger and her family was going through tough times?",
+      "ground_truth": "Her aunt",
+      "prediction": "auntie",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Is it likely that Nate has friends besides Joanna?",
+      "ground_truth": "Yesteammates on hisvideo game ",
+      "prediction": "the given information, it is l",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What kind of interests do Joanna and Nate share?",
+      "ground_truth": "Watching movies, making desser",
+      "prediction": "writing, gaming, cooking",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Joanna first watch \"Eternal Sunshine of the Spotless Mind?",
+      "ground_truth": "2019",
+      "prediction": "21 January, 2019",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Nate win his first video game tournament?",
+      "ground_truth": "the week before 21Janury, 2022",
+      "prediction": "21 January 2022",
+      "f1": 0.28571428571428575,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What pets wouldn't cause any discomfort to Joanna?",
+      "ground_truth": "Hairless cats or pigs,since th",
+      "prediction": "The conversations indicate tha",
+      "f1": 0.06451612903225808,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What are Joanna's hobbies?",
+      "ground_truth": "Writing, watchingmovies, explo",
+      "prediction": "writing scripts",
+      "f1": 0.28571428571428575,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "How long has Nate had his first two turtles?",
+      "ground_truth": "three years",
+      "prediction": "1 year and 2 months",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Joanna finish her first screenplay?",
+      "ground_truth": "The Friday before 23January, 2",
+      "prediction": "21 January, 2022",
+      "f1": 0.28571428571428575,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Nate get his first two turtles?",
+      "ground_truth": "2019",
+      "prediction": "23 January, 2022",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What major achievement did Joanna accomplish in January 2022?",
+      "ground_truth": "finished her screenplay and pr",
+      "prediction": "There is no direct mention of ",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "what are John's goals with regards to his basketball career?",
+      "ground_truth": "improve shooting percentage, w",
+      "prediction": "basketball endorsements, spons",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What are John's goals for his career that are not related to his basketball skills?",
+      "ground_truth": "get endorsements, build his br",
+      "prediction": "collaborations, endorsements, ",
+      "f1": 0.15384615384615385,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What items does John collect?",
+      "ground_truth": "sneakers, fantasy movie DVDs, ",
+      "prediction": "jerseys",
+      "f1": 0.33333333333333337,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Would Tim enjoy reading books by C. S. Lewis or John Greene?",
+      "ground_truth": "C. S.Lewis",
+      "prediction": "Yes, Tim would enjoy reading b",
+      "f1": 0.09523809523809525,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What books has Tim read?",
+      "ground_truth": "Harry Potter, Game of Thrones,",
+      "prediction": "fantasy books, J.K. Rowling's ",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Based on Tim's collections, what is a shop that he would enjoy visiting in New York city?",
+      "ground_truth": "House of MinaLima",
+      "prediction": "Tim's love for books and escap",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "In which month's game did John achieve a career-high score in points?",
+      "ground_truth": "June 2023",
+      "prediction": "July 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "Which geographical locations has Tim been to?",
+      "ground_truth": "California, London, the Smoky ",
+      "prediction": "London",
+      "f1": 0.4,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Which outdoor gear company likely signed up John for an endorsement deal?",
+      "ground_truth": "Under Armour",
+      "prediction": "The outdoor gear company that ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Which endorsement deals has John been offered?",
+      "ground_truth": "basketball shoes and gear deal",
+      "prediction": "Nike, Gatorade",
+      "f1": 0.19999999999999998,
+      "em": false,
+      "category": "single-hop"
+    }
+  ]
+}

@@ -1,0 +1,819 @@
+{
+  "version": "v3",
+  "model": "ollama/qwen2.5:32b",
+  "overall_f1": 0.24919162000501702,
+  "overall_em": 0.0,
+  "total_questions": 99,
+  "total_time_s": 670.7690908908844,
+  "by_category": {
+    "single-hop": {
+      "f1": 0.1240299823633157,
+      "em": 0.0,
+      "count": 36
+    },
+    "temporal": {
+      "f1": 0.3654545454545454,
+      "em": 0.0,
+      "count": 50
+    },
+    "multi-hop": {
+      "f1": 0.14862798020692758,
+      "em": 0.0,
+      "count": 13
+    }
+  },
+  "results": [
+    {
+      "question": "When did Caroline go to the LGBTQ support group?",
+      "ground_truth": "7 May 2023",
+      "prediction": "1:56 pm on 8 May, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie paint a sunrise?",
+      "ground_truth": "2022",
+      "prediction": "1:56 pm on 8 May, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie run a charity race?",
+      "ground_truth": "The sunday before 25 May 2023",
+      "prediction": "1:14 pm on 25 May, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Melanie planning on going camping?",
+      "ground_truth": "June 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline give a speech at a school?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "7:55 pm on 9 June, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline meet up with her friends, family, and mentors?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "7:55 pm on 9 June, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "How long has Caroline had her current group of friends for?",
+      "ground_truth": "4 years",
+      "prediction": "7:55 pm on 9 June, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "How long ago was Caroline's 18th birthday?",
+      "ground_truth": "10 years ago",
+      "prediction": "27 June, 2013",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie sign up for a pottery class?",
+      "ground_truth": "2 July 2023",
+      "prediction": "1:50 pm on 17 August, 2023",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Caroline going to the transgender conference?",
+      "ground_truth": "July 2023",
+      "prediction": "1:36 pm on 3 July, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie go to the museum?",
+      "ground_truth": "5 July 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline have a picnic?",
+      "ground_truth": "The week before 6 July 2023",
+      "prediction": "1:50 pm on 17 August, 2023",
+      "f1": 0.1818181818181818,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline go to the LGBTQ conference?",
+      "ground_truth": "10 July 2023",
+      "prediction": "4:33 pm on 12 July, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie read the book \"nothing is impossible\"?",
+      "ground_truth": "2022",
+      "prediction": "4:33 pm on 12 July, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline go to the adoption meeting?",
+      "ground_truth": "The friday before 15 July 2023",
+      "prediction": "1:51 pm on 15 July, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie go to the pottery workshop?",
+      "ground_truth": "The Friday before 15 July 2023",
+      "prediction": "1:50 pm on 17 August, 2023",
+      "f1": 0.1818181818181818,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie go camping in June?",
+      "ground_truth": "The week before 27 June 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.1818181818181818,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline go to a pride parade during the summer?",
+      "ground_truth": "The week before 3 July 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.3636363636363636,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie go camping in July?",
+      "ground_truth": "two weekends before 17 July 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.3333333333333333,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline join a mentorship program?",
+      "ground_truth": "The weekend before 17 July 2023",
+      "prediction": "2:31 pm on 17 July, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline join a new activist group?",
+      "ground_truth": "The Tuesday before 20 July 2023",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Melanie's daughter's birthday?",
+      "ground_truth": "13 August",
+      "prediction": "2:24 pm on 14 August, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline attend a pride parade in August?",
+      "ground_truth": "The Friday before 14 August 2023",
+      "prediction": "2:24 pm on 14 August, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline and Melanie go to a pride fesetival together?",
+      "ground_truth": "2022",
+      "prediction": "8:56 pm on 20 July, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline apply to adoption agencies?",
+      "ground_truth": "The week of 23 August 2023",
+      "prediction": "3:31 pm on 23 August, 2023",
+      "f1": 0.5454545454545454,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certification",
+      "prediction": "Social work, counseling",
+      "f1": 0.3333333333333333,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline still want to pursue counseling as a career if she hadn't received support growing up?",
+      "ground_truth": "Likely no",
+      "prediction": "Probably not",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline likely have Dr. Seuss books on her bookshelf?",
+      "ground_truth": "Yes, since she collects classic children's books",
+      "prediction": "Yes",
+      "f1": 0.25,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline pursue writing as a career option?",
+      "ground_truth": "LIkely no; though she likes reading, she wants to be a counselor",
+      "prediction": "the provided context, there's no explicit indication that Caroline would pursue writing as a career ",
+      "f1": 0.08333333333333334,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered a member of the LGBTQ community?",
+      "ground_truth": "Likely no, she does not refer to herself as part of it",
+      "prediction": "the provided context, there is no evidence to conclude that Melanie is a member of the LGBTQ communi",
+      "f1": 0.22222222222222224,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be more interested in going to a national park or a theme park?",
+      "ground_truth": "National park; she likes the outdoors",
+      "prediction": "the information provided, Melanie would be more interested in going to a national park rather than a",
+      "f1": 0.21052631578947364,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered an ally to the transgender community?",
+      "ground_truth": "Yes, she is supportive",
+      "prediction": "these points, Melanie can be considered an ally to the transgender community as she shows support, e",
+      "f1": 0.10526315789473685,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What would Caroline's political leaning likely be?",
+      "ground_truth": "Liberal",
+      "prediction": "Likely leans left.",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline be considered religious?",
+      "ground_truth": "Somewhat, but not extremely religious",
+      "prediction": "the provided information, we cannot conclusively determine if Caroline is religious or not. The inte",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie likely enjoy the song \"The Four Seasons\" by Vivaldi?",
+      "ground_truth": "Yes; it's classical music",
+      "prediction": "Yes",
+      "f1": 0.4,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What personality traits might Melanie say Caroline has?",
+      "ground_truth": "Thoughtful, authentic, driven",
+      "prediction": "Courageous, Inspiring, Resilient",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie go on another roadtrip soon?",
+      "ground_truth": "Likely no; since this one went badly",
+      "prediction": "Not specified directly.",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline want to move back to her home country soon?",
+      "ground_truth": "No; she's in the process of adopting children.",
+      "prediction": "the information provided and the context of Caroline's current life situation and future goals, it i",
+      "f1": 0.10526315789473685,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What did Caroline research?",
+      "ground_truth": "Adoption agencies",
+      "prediction": "adoption agency or lawyer",
+      "f1": 0.3333333333333333,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's identity?",
+      "ground_truth": "Transgender woman",
+      "prediction": "trans woman",
+      "f1": 0.5,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's relationship status?",
+      "ground_truth": "Single",
+      "prediction": "- Melanie: [2:31 pm on 17 July, 2023] Melanie: Caroline, awesome news that you two are getting along",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where did Caroline move from 4 years ago?",
+      "ground_truth": "Sweden",
+      "prediction": "happened that was so awesome",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What career path has Caroline decided to persue?",
+      "ground_truth": "counseling or mental health for Transgender people",
+      "prediction": "- Caroline: [3:19 pm on 28 August, 2023] Caroline: Yeah totally",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What activities does Melanie partake in?",
+      "ground_truth": "pottery, camping, painting, swimming",
+      "prediction": "Swimming with the kids",
+      "f1": 0.28571428571428575,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where has Melanie camped?",
+      "ground_truth": "beach, mountains, forest",
+      "prediction": "beach recently",
+      "f1": 0.4,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What do Melanie's kids like?",
+      "ground_truth": "dinosaurs, nature",
+      "prediction": "swimming",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What books has Melanie read?",
+      "ground_truth": "\"Nothing is Impossible\", \"Charlotte's Web\"",
+      "prediction": "Charlotte's Web",
+      "f1": 0.5714285714285715,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What does Melanie do to destress?",
+      "ground_truth": "Running, pottery",
+      "prediction": "running",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What LGBTQ+ events has Caroline participated in?",
+      "ground_truth": "Pride parade, school speech, support group",
+      "prediction": "- Caroline: [3:19 pm on 28 August, 2023] Caroline: Yeah totally",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What events has Caroline participated in to help children?",
+      "ground_truth": "Mentoring program, school speech",
+      "prediction": "- Caroline: [3:19 pm on 28 August, 2023] Caroline: Yeah totally",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What did Melanie paint recently?",
+      "ground_truth": "sunset",
+      "prediction": "abstract painting",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What activities has Melanie done with her family?",
+      "ground_truth": "Pottery, painting, camping, museum, swimming, hiking",
+      "prediction": "swimming with the kids",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "In what ways is Caroline participating in the LGBTQ community?",
+      "ground_truth": "Joining activist group, going to pride parades, participating in an art show, mentoring program",
+      "prediction": "drawn symbol for freedom and being real",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "How many times has Melanie gone to the beach in 2023?",
+      "ground_truth": "2",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What kind of art does Caroline make?",
+      "ground_truth": "abstract art",
+      "prediction": "drawing, stands for freedom and being real",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Who supports Caroline when she has a negative experience?",
+      "ground_truth": "Her mentors, family, and friends",
+      "prediction": "those close to me",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What types of pottery have Melanie and her kids made?",
+      "ground_truth": "bowls, cup",
+      "prediction": "- Melanie: [3:19 pm on 28 August, 2023] Melanie: Music's amazing, isn't it",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What has Melanie painted?",
+      "ground_truth": "Horse, sunset, sunrise",
+      "prediction": "lake sunrise, abstract painting",
+      "f1": 0.28571428571428575,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What are Melanie's pets' names?",
+      "ground_truth": "Oliver, Luna, Bailey",
+      "prediction": "Luna and Oliver",
+      "f1": 0.8,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What subject have Caroline and Melanie both painted?",
+      "ground_truth": "Sunsets",
+      "prediction": "No specific subject mentioned.",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What symbols are important to Caroline?",
+      "ground_truth": "Rainbow flag, transgender symbol",
+      "prediction": "freedom and being real",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What instruments does Melanie play?",
+      "ground_truth": "clarinet and violin",
+      "prediction": "- Melanie: [10:37 am on 27 June, 2023] Melanie: Congrats Caroline",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What musical artists/bands has Melanie seen?",
+      "ground_truth": "Summer Sounds, Matt Patterson",
+      "prediction": "No specific artists mentioned.",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When Jon has lost his job as a banker?",
+      "ground_truth": "19 January, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Gina has lost her job at Door Dash?",
+      "ground_truth": "January, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Jon's group performing at a festival?",
+      "ground_truth": "February, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina launch an ad campaign for her store?",
+      "ground_truth": "29 January, 2023",
+      "prediction": "2:32 pm on 29 January, 2023",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When was Jon in Paris?",
+      "ground_truth": "28 January 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina team up with a local artist for some cool designs?",
+      "ground_truth": "February, 2023",
+      "prediction": "9:32 am on 8 February, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina get her tattoo?",
+      "ground_truth": "A few years ago",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon start to go to the gym?",
+      "ground_truth": "March, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina open her online clothing store?",
+      "ground_truth": "16 March, 2023",
+      "prediction": "11:24 am on 25 April, 2023",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon start expanding his studio's social media presence?",
+      "ground_truth": "April, 2023",
+      "prediction": "1:26 pm on 3 April, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon host a dance competition?",
+      "ground_truth": "May, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon go to a fair to get more exposure for his dance studio?",
+      "ground_truth": "24 April, 2023",
+      "prediction": "8:29 pm on 13 June, 2023",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina interview for a design internship?",
+      "ground_truth": "10 May, 2023",
+      "prediction": "3:14 pm on 11 May, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina get accepted for the design internship?",
+      "ground_truth": "27 May, 2023",
+      "prediction": "3:14 pm on 11 May, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon start reading \"The Lean Startup\"?",
+      "ground_truth": "May, 2023",
+      "prediction": "7:18 pm on 27 May, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina develop a video presentation to teach how to style her fashion pieces? ",
+      "ground_truth": "June, 2023",
+      "prediction": "8:29 pm on 13 June, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon receive mentorship to promote his venture?",
+      "ground_truth": "15 June, 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When was Jon in Rome?",
+      "ground_truth": "June 2023",
+      "prediction": "4:04 pm on 20 January, 2023",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Jon is planning to open his dance studio?",
+      "ground_truth": "20 June, 2023",
+      "prediction": "12:48 am on 1 February, 2023",
+      "f1": 0.2222222222222222,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina design a limited collection of hoodies?",
+      "ground_truth": "June 2023",
+      "prediction": "2:15 pm on 21 June, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon visit networking events for his store?",
+      "ground_truth": "20 June, 2023",
+      "prediction": "2:15 pm on 21 June, 2023",
+      "f1": 0.4444444444444444,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina start being recognized by fashion editors?",
+      "ground_truth": "July 2023",
+      "prediction": "1:25 pm on 9 July, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon start learning marketing and analytics tools?",
+      "ground_truth": "July, 2023",
+      "prediction": "1:25 pm on 9 July, 2023",
+      "f1": 0.5,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Jon and Gina decide to collaborate to create dance content?",
+      "ground_truth": "21 July 2023",
+      "prediction": "5:44 pm on 21 July, 2023",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina mention Shia Labeouf?",
+      "ground_truth": " 23 July, 2023",
+      "prediction": "6:46 pm on 23 July, 2023",
+      "f1": 0.6666666666666666,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What do Jon and Gina both have in common?",
+      "ground_truth": "They lost their jobs and decided to start their own businesses.",
+      "prediction": "Support and encouragement",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What Jon thinks the ideal dance studio should look like?",
+      "ground_truth": "By the water, with natural light and Marley flooring",
+      "prediction": "- Gina: [3:14 pm on 11 May, 2023] Gina: I get it, Jon",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Which city have both Jean and John visited?",
+      "ground_truth": "Rome",
+      "prediction": "Not provided in context.",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Why did Gina decide to start her own clothing store?",
+      "ground_truth": "She always loved fashion trends and finding unique pieces and she lost her job so decided it was time to start her own business.",
+      "prediction": "- Gina: [8:29 pm on 13 June, 2023] Gina: Remember that staying positive is very important",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Do Jon and Gina start businesses out of what they love?",
+      "ground_truth": "Yes",
+      "prediction": "Yes, dancing and clothing store.",
+      "f1": 0.4,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "How did Gina promote her clothes store?",
+      "ground_truth": "worked with an artist to make unique fashion pieces, made limited-edition sweatshirts, got some new offers and promotions for online store, developed a video presentation showing how to style her pieces",
+      "prediction": "Use social media channels influencers",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Which events has Jon participated in to promote his business venture?",
+      "ground_truth": "fair, networking events, dance competition",
+      "prediction": "exact words from the context. The closest relevant information suggests plans to use marketing strat",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What does Jon's dance studio offer?",
+      "ground_truth": "one-on-one metoring and training to dancers,  workshops and classes to local schools and centers",
+      "prediction": "teaching others dancing joy",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Did Jon and Gina both participate in dance competitions?",
+      "ground_truth": "Yes",
+      "prediction": "No participation mentioned.",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Which cities has Jon visited?",
+      "ground_truth": "Paris, Rome",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "How long did it take for Jon to open his studio?",
+      "ground_truth": "six months",
+      "prediction": "Not specified",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    }
+  ]
+}

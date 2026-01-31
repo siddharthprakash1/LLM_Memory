@@ -1,0 +1,267 @@
+{
+  "version": "v3",
+  "model": "ollama/qwen2.5:7b",
+  "overall_f1": 0.05860862668654206,
+  "overall_em": 0.0,
+  "total_questions": 30,
+  "total_time_s": 14.846812009811401,
+  "by_category": {
+    "single-hop": {
+      "f1": 0.0,
+      "em": 0.0,
+      "count": 10
+    },
+    "temporal": {
+      "f1": 0.15841847265221878,
+      "em": 0.0,
+      "count": 10
+    },
+    "multi-hop": {
+      "f1": 0.017407407407407406,
+      "em": 0.0,
+      "count": 10
+    }
+  },
+  "results": [
+    {
+      "question": "When did Caroline go to the LGBTQ support group?",
+      "ground_truth": "7 May 2023",
+      "prediction": "- [1:56 pm on 8 May, 2023] Caroline: I went to a LGBTQ support group yesterday a",
+      "f1": 0.23529411764705882,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie paint a sunrise?",
+      "ground_truth": "2022",
+      "prediction": "- [1:56 pm on 8 May, 2023] Melanie: Yeah, I painted that lake sunrise last year!",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie run a charity race?",
+      "ground_truth": "The sunday before 25 May 2023",
+      "prediction": "- [1:14 pm on 25 May, 2023] Melanie: Hey Caroline, since we last chatted, I've h",
+      "f1": 0.3,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Melanie planning on going camping?",
+      "ground_truth": "June 2023",
+      "prediction": "- [1:14 pm on 25 May, 2023] Melanie: Thanks, Caroline. It's still a work in prog",
+      "f1": 0.125,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline give a speech at a school?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "- [3:31 pm on 23 August, 2023] Caroline: Hi Melanie! Hope you're doing good. Gue",
+      "f1": 0.10526315789473682,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline meet up with her friends, family, and mentors?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "- [7:55 pm on 9 June, 2023] Caroline: Thanks, Mel! My friends, family and mentor",
+      "f1": 0.33333333333333337,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "How long has Caroline had her current group of friends for?",
+      "ground_truth": "4 years",
+      "prediction": "- [1:50 pm on 17 August, 2023] Caroline: Hey Mel! How're ya doin'? Recently, I h",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "How long ago was Caroline's 18th birthday?",
+      "ground_truth": "10 years ago",
+      "prediction": "- [12:09 am on 13 September, 2023] Caroline: Since I was 17 or so. I find it soe",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie sign up for a pottery class?",
+      "ground_truth": "2 July 2023",
+      "prediction": "- [1:36 pm on 3 July, 2023] Melanie: Wow, Caroline! That's great! I just signed ",
+      "f1": 0.23529411764705882,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Caroline going to the transgender conference?",
+      "ground_truth": "July 2023",
+      "prediction": "- [1:36 pm on 3 July, 2023] Caroline: Thanks Mel! I'm going to a transgender con",
+      "f1": 0.25,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certification",
+      "prediction": "- [10:37 am on 27 June, 2023] Melanie: Woah, Caroline, it sounds like you're doi",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline still want to pursue counseling as a career if she hadn't received support growing up?",
+      "ground_truth": "Likely no",
+      "prediction": "- [10:37 am on 27 June, 2023] Caroline: Lately, I've been looking into counselin",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline likely have Dr. Seuss books on her bookshelf?",
+      "ground_truth": "Yes, since she collects classic children's books",
+      "prediction": "- [4:33 pm on 12 July, 2023] Melanie: Wow, Caroline! Books have such an awesome ",
+      "f1": 0.1,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline pursue writing as a career option?",
+      "ground_truth": "LIkely no; though she likes reading, she wants to be a counselor",
+      "prediction": "- [10:37 am on 27 June, 2023] Caroline: Lately, I've been looking into counselin",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered a member of the LGBTQ community?",
+      "ground_truth": "Likely no, she does not refer to herself as part of it",
+      "prediction": "- [7:55 pm on 9 June, 2023] Melanie: Hey Caroline! Great to hear from you. Sound",
+      "f1": 0.07407407407407407,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be more interested in going to a national park or a theme park?",
+      "ground_truth": "National park; she likes the outdoors",
+      "prediction": "- [1:36 pm on 3 July, 2023] Caroline: Thanks Mel! I'm going to a transgender con",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered an ally to the transgender community?",
+      "ground_truth": "Yes, she is supportive",
+      "prediction": "- [1:33 pm on 25 August, 2023] Melanie: Thanks, Caroline! I really appreciate yo",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What would Caroline's political leaning likely be?",
+      "ground_truth": "Liberal",
+      "prediction": "- [7:55 pm on 9 June, 2023] Melanie: Yes, Caroline! We can do it. Your courage i",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline be considered religious?",
+      "ground_truth": "Somewhat, but not extremely religious",
+      "prediction": "- [1:50 pm on 17 August, 2023] Caroline: Hey Mel! How're ya doin'? Recently, I h",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie likely enjoy the song \"The Four Seasons\" by Vivaldi?",
+      "ground_truth": "Yes; it's classical music",
+      "prediction": "- [3:19 pm on 28 August, 2023] Melanie: \"Summer Sounds\"- The playing an awesome ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What did Caroline research?",
+      "ground_truth": "Adoption agencies",
+      "prediction": "- [8:56 pm on 20 July, 2023] Caroline: Cool! What did it look like? (Date: 8:56 ",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's identity?",
+      "ground_truth": "Transgender woman",
+      "prediction": "- [7:55 pm on 9 June, 2023] Caroline: Thanks, Mel! Your backing really means a l",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's relationship status?",
+      "ground_truth": "Single",
+      "prediction": "- [2:31 pm on 17 July, 2023] Melanie: Caroline, awesome news that you two are ge",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where did Caroline move from 4 years ago?",
+      "ground_truth": "Sweden",
+      "prediction": "- [7:55 pm on 9 June, 2023] Caroline: Yeah, I'm really lucky to have them. They'",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What career path has Caroline decided to persue?",
+      "ground_truth": "counseling or mental health for Transgender people",
+      "prediction": "- [1:33 pm on 25 August, 2023] Caroline: Finding a community where I'm accepted,",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What activities does Melanie partake in?",
+      "ground_truth": "pottery, camping, painting, swimming",
+      "prediction": "- [10:31 am on 13 October, 2023] Melanie: That's awesome, Caroline! You drew it?",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where has Melanie camped?",
+      "ground_truth": "beach, mountains, forest",
+      "prediction": "- [4:33 pm on 12 July, 2023] Melanie: Wow, Caroline! Books have such an awesome ",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What do Melanie's kids like?",
+      "ground_truth": "dinosaurs, nature",
+      "prediction": "- [2:24 pm on 14 August, 2023] Melanie: Wow, Caroline! That sounds awesome. This",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What books has Melanie read?",
+      "ground_truth": "\"Nothing is Impossible\", \"Charlotte's Web\"",
+      "prediction": "- [8:18 pm on 6 July, 2023] Melanie: Sounds great! What kind of books you got in",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What does Melanie do to destress?",
+      "ground_truth": "Running, pottery",
+      "prediction": "- [10:31 am on 13 October, 2023] Melanie: That's awesome, Caroline! You drew it?",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    }
+  ]
+}

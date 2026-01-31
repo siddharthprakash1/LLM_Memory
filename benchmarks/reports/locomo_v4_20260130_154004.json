@@ -1,0 +1,187 @@
+{
+  "version": "v4",
+  "model": "ollama/qwen2.5:32b",
+  "overall_f1": 0.0,
+  "overall_em": 0.0,
+  "total_questions": 20,
+  "total_time_s": 70.91639709472656,
+  "by_category": {
+    "single-hop": {
+      "f1": 0.0,
+      "em": 0.0,
+      "count": 6
+    },
+    "temporal": {
+      "f1": 0.0,
+      "em": 0.0,
+      "count": 13
+    },
+    "multi-hop": {
+      "f1": 0.0,
+      "em": 0.0,
+      "count": 1
+    }
+  },
+  "results": [
+    {
+      "question": "When did Caroline go to the LGBTQ support group?",
+      "ground_truth": "7 May 2023",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Melanie paint a sunrise?",
+      "ground_truth": "2022",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certifi",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What did Caroline research?",
+      "ground_truth": "Adoption agencies",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's identity?",
+      "ground_truth": "Transgender woman",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Melanie run a charity race?",
+      "ground_truth": "The sunday before 25 May 2023",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When is Melanie planning on going camping?",
+      "ground_truth": "June 2023",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What is Caroline's relationship status?",
+      "ground_truth": "Single",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Caroline give a speech at a school?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Caroline meet up with her friends, family, and mentors?",
+      "ground_truth": "The week before 9 June 2023",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Jon has lost his job as a banker?",
+      "ground_truth": "19 January, 2023",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When Gina has lost her job at Door Dash?",
+      "ground_truth": "January, 2023",
+      "prediction": "The provided fact does not con",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "What do Jon and Gina both have in common?",
+      "ground_truth": "They lost their jobs and decid",
+      "prediction": "writing",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What Jon thinks the ideal dance studio should look like?",
+      "ground_truth": "By the water, with natural lig",
+      "prediction": "writing",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When is Jon's group performing at a festival?",
+      "ground_truth": "February, 2023",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina launch an ad campaign for her store?",
+      "ground_truth": "29 January, 2023",
+      "prediction": "There is no information provid",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When was Jon in Paris?",
+      "ground_truth": "28 January 2023",
+      "prediction": "The provided facts do not cont",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "Which city have both Jean and John visited?",
+      "ground_truth": "Rome",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "When did Gina team up with a local artist for some cool designs?",
+      "ground_truth": "February, 2023",
+      "prediction": "There is no information provid",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    },
+    {
+      "question": "When did Gina get her tattoo?",
+      "ground_truth": "A few years ago",
+      "prediction": "The provided fact does not con",
+      "f1": 0.0,
+      "em": false,
+      "category": "temporal"
+    }
+  ]
+}
