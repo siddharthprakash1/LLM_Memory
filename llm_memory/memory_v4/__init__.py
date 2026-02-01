@@ -41,6 +41,7 @@ from .conflict_resolver import ConflictResolver, ConflictType, ConflictResult
 from .temporal_state import TemporalStateTracker, TemporalState, TemporalType
 from .memory_store import MemoryStoreV4, Episode, create_memory_v4
 from .retrieval import MultiAngleRetriever, RetrievalResult, create_retriever
+from .multi_hop import MultiHopReasoner, QueryDecomposer, ReasoningStep
 
 __all__ = [
     # Core classes
@@ -71,4 +72,9 @@ __all__ = [
     "MultiAngleRetriever",
     "RetrievalResult",
     "create_retriever",
+    
+    # Reasoning
+    "MultiHopReasoner",
+    "QueryDecomposer",
+    "ReasoningStep",
 ]

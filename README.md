@@ -48,10 +48,10 @@ graph TD
     Extract --> Resolve[Conflict Resolver]
     
     subgraph "Memory Store"
-        Resolve --> Facts[Fact Store (SQL)]
+        Resolve --> Facts["Fact Store (SQL)"]
         Resolve --> Graph[Knowledge Graph]
         Resolve --> Temporal[Temporal State Tracker]
-        Norm --> Episodes[Episodic Store (Raw)]
+        Norm --> Episodes["Episodic Store (Raw)"]
     end
     
     subgraph "Retrieval Engine"

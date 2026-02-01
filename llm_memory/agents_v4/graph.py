@@ -13,9 +13,9 @@ from langchain_ollama import ChatOllama
 from langgraph.graph import StateGraph, END
 from langgraph.prebuilt import ToolNode
 
-from .state import AgentState
-from .tools import get_memory_tools
-from ..memory_v4.memory_store import MemoryStoreV4
+from llm_memory.agents_v4.state import AgentState
+from llm_memory.agents_v4.tools import get_memory_tools
+from llm_memory.memory_v4.memory_store import MemoryStoreV4
 
 
 SYSTEM_PROMPT = """You are a helpful AI assistant with Long-Term Memory.
@@ -67,6 +67,28 @@ class MemoryAgent:
         self.graph = self._build_graph()
         
     def _build_graph(self):
+        # Use SqliteSaver for persistent memory of the conversation state itself
+        # Note: In newer LangGraph versions, checkpointer location might vary
+        try:
+            from langgraph.checkpoint.sqlite import SqliteSaver
+        except ImportError:
+            # Fallback for newer langgraph versions where it might be in a different path
+            # or if the package name changed. 
+            # Let's try the core checkpointer if sqlite specific one fails, 
+            # but actually let's check what's available.
+            # For now, let's assume it's available or we need to install langgraph-checkpoint-sqlite
+            # But wait, we installed langgraph-checkpoint.
+            from langgraph.checkpoint.sqlite import SqliteSaver
+        
+        import sqlite3
+        
+        # Ensure checkpoint directory exists
+        import os
+        os.makedirs(self.memory.persist_path, exist_ok=True)
+        db_path = f"{self.memory.persist_path}/checkpoints.sqlite"
+        conn = sqlite3.connect(db_path, check_same_thread=False)
+        checkpointer = SqliteSaver(conn)
+        
         workflow = StateGraph(AgentState)
         
         # Define Nodes
@@ -90,7 +112,7 @@ class MemoryAgent:
         
         workflow.add_edge("tools", "agent")
         
-        return workflow.compile()
+        return workflow.compile(checkpointer=checkpointer)
 
     def _load_memory_node(self, state: AgentState):
         """Implicitly load relevant memory before agent acts."""
@@ -100,11 +122,13 @@ class MemoryAgent:
             
         last_msg = messages[-1]
         if isinstance(last_msg, HumanMessage):
-            # Simple retrieval for context
-            # We use the retriever directly to get a string summary
-            from ..memory_v4.retrieval import create_retriever
-            retriever = create_retriever(self.memory)
-            context = retriever.build_context(last_msg.content, max_results=3)
+            # Use the memory store's build_context_for_question method
+            # which now includes the multi-hop reasoner logic
+            context = self.memory.build_context_for_question(
+                last_msg.content, 
+                max_facts=20,
+                include_episodes=True
+            )
             return {"memory_context": context}
             
         return {}
@@ -136,12 +160,17 @@ class MemoryAgent:
         """Run a chat interaction."""
         config = {"configurable": {"thread_id": thread_id}}
         
+        # Get current state to see if we have history
+        current_state = self.graph.get_state(config)
+        
+        # If we have history, we don't need to re-initialize everything,
+        # but LangGraph handles appending automatically if we pass messages.
+        
         # Add user message to state
         inputs = {
             "messages": [HumanMessage(content=user_input)],
             "user_id": "default",
-            "memory_context": "",
-            "scratchpad": {}
+            # Don't overwrite memory_context here, let the graph update it
         }
         
         # Stream output

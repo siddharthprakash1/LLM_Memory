@@ -104,6 +104,12 @@ class MultiAngleRetriever:
                      'has', 'have', 'had', 'do', 'for', 'to', 'in', 'on', 'at'}
         query_words -= stop_words
         
+        # If query is about "me" or "my", include "user" and "siddharth" in search
+        if any(w in query_lower.split() for w in ['me', 'my', 'mine', 'myself']):
+            query_words.add('user')
+            # Also try to find user's name if known (this would require access to user profile/context)
+            # For now, we rely on the fact that facts about the user usually have subject="User" or the user's name
+        
         for fact in self.memory.facts.values():
             if not fact.is_current:
                 continue
@@ -122,6 +128,10 @@ class MultiAngleRetriever:
                 # Boost for object match
                 if any(w in fact.object.lower() for w in query_words):
                     score += 0.2
+                
+                # Boost for facts about User if query is about "me"
+                if fact.subject.lower() == 'user' and any(w in query_lower.split() for w in ['me', 'my']):
+                    score += 0.5
                 
                 results.append(RetrievalResult(
                     content=fact.as_statement(),
@@ -148,6 +158,10 @@ class MultiAngleRetriever:
         
         # Extract entities from query
         query_entities = self._extract_entities(query)
+        
+        # Add "User" entity if query contains "me" or "my"
+        if any(w in query.lower().split() for w in ['me', 'my', 'mine', 'myself']):
+            query_entities.add('user')
         
         for fact in self.memory.facts.values():
             if not fact.is_current:
@@ -185,6 +199,10 @@ class MultiAngleRetriever:
         """
         results = []
         query_entities = self._extract_entities(query)
+        
+        # Add "User" entity if query contains "me" or "my"
+        if any(w in query.lower().split() for w in ['me', 'my', 'mine', 'myself']):
+            query_entities.add('user')
         
         # For each query entity, find related entities
         related_entities: Set[str] = set()

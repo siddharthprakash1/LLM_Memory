@@ -16,8 +16,8 @@ from threading import Thread
 import webbrowser
 import time
 
-from .graph import MemoryAgent
-from ..memory_v4.memory_store import MemoryStoreV4
+from llm_memory.agents_v4.graph import MemoryAgent
+from llm_memory.memory_v4.memory_store import MemoryStoreV4
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -436,22 +436,26 @@ def chat():
     
     agent = get_agent()
     
-    # Capture stdout to get agent response (since agent.chat() prints)
-    # We need to modify agent.chat to return the response or capture it
-    # For now, let's use the graph directly
+    # Run chat with the agent's chat method (which handles state)
+    # But we need to capture the output.
+    # The agent.chat method prints to stdout. We should modify agent.chat or use graph directly.
+    # Let's use graph directly but ensure we pass the thread_id for persistence.
     
     from langchain_core.messages import HumanMessage
+    
+    # Use a fixed thread_id for the UI session
+    # In a real app, this would come from the client/cookie
+    thread_id = "web_session_1"
     
     inputs = {
         "messages": [HumanMessage(content=message)],
         "user_id": "default",
-        "memory_context": "",
-        "scratchpad": {}
+        # Don't overwrite memory_context here
     }
     
-    # Run graph
+    # Run graph with config
     response_text = ""
-    for event in agent.graph.stream(inputs, config={"configurable": {"thread_id": "1"}}):
+    for event in agent.graph.stream(inputs, config={"configurable": {"thread_id": thread_id}}):
         for key, value in event.items():
             if key == "agent":
                 response_text = value["messages"][0].content

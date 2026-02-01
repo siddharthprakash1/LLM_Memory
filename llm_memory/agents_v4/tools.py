@@ -9,8 +9,8 @@ from pydantic import BaseModel, Field
 from langchain_core.tools import BaseTool
 from datetime import datetime
 
-from ..memory_v4.memory_store import MemoryStoreV4
-from ..memory_v4.retrieval import create_retriever
+from llm_memory.memory_v4.memory_store import MemoryStoreV4
+from llm_memory.memory_v4.retrieval import create_retriever
 
 
 class SaveMemoryInput(BaseModel):
@@ -44,8 +44,8 @@ class SearchMemoryTool(BaseTool):
     memory: MemoryStoreV4
 
     def _run(self, query: str, top_k: int = 5):
-        retriever = create_retriever(self.memory)
-        context = retriever.build_context(query, max_results=top_k)
+        # Use the memory store's build_context_for_question which handles reasoning
+        context = self.memory.build_context_for_question(query, max_facts=top_k, include_episodes=True)
         return context if context else "No relevant memories found."
 
 
@@ -59,14 +59,8 @@ class AskMemoryTool(BaseTool):
     memory: MemoryStoreV4
 
     def _run(self, question: str):
-        # First check temporal
-        duration_answer = self.memory.answer_duration_question(question)
-        if duration_answer:
-            return f"Temporal Answer: {duration_answer}"
-            
-        # Fallback to retrieval + context
-        retriever = create_retriever(self.memory)
-        context = retriever.build_context(question)
+        # Use the memory store's build_context_for_question which handles reasoning
+        context = self.memory.build_context_for_question(question, include_episodes=True)
         return context
 
 

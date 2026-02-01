@@ -98,26 +98,31 @@ DATE: {date}
 
 Extract ALL facts mentioned. For each fact, provide:
 - type: preference|attribute|relationship|event|state_change|plan|opinion|temporal
-- subject: who/what the fact is about (use speaker name if about them)
-- predicate: the relationship/action verb
+- subject: who/what the fact is about (use speaker name if about them, or other entities)
+- predicate: the relationship/action verb (e.g., "is a", "works at", "located in")
 - object: what the fact states
 - temporal_scope: ongoing|past|future|point_in_time
 - duration: if mentioned (e.g., "4 years", "since 2020")
 - confidence: 0.0-1.0 based on how explicit the fact is
 
 IMPORTANT RULES:
-1. Extract EVERY meaningful fact, even small ones
-2. For "I like X", subject={speaker}, predicate="likes", object="X"
-3. For "I moved from X", type="state_change", extract the origin
-4. For "4 years ago", calculate and note the duration
-5. Resolve "I/my" to the speaker name
-6. Don't include timestamps in the object
+1. Extract EVERY meaningful fact, even small ones.
+2. Extract relationships between entities mentioned, not just about the speaker.
+   - Example: "I work at Couchbase, which is a database company."
+     -> Fact 1: Subject="User", Predicate="works at", Object="Couchbase"
+     -> Fact 2: Subject="Couchbase", Predicate="is a", Object="database company"
+3. Be granular. Break complex sentences into multiple facts.
+4. For "I like X", subject={speaker}, predicate="likes", object="X"
+5. For "I moved from X", type="state_change", extract the origin
+6. For "4 years ago", calculate and note the duration
+7. Resolve "I/my" to the speaker name
+8. Don't include timestamps in the object
 
 Return JSON array of facts:
 ```json
 [
   {{"type": "preference", "subject": "Caroline", "predicate": "likes", "object": "hiking", "temporal_scope": "ongoing", "duration": null, "confidence": 0.9}},
-  ...
+  {{"type": "attribute", "subject": "Couchbase", "predicate": "is a", "object": "database company", "temporal_scope": "ongoing", "confidence": 0.95}}
 ]
 ```
 

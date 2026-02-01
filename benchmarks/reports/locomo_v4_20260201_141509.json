@@ -1,0 +1,321 @@
+{
+  "version": "v4",
+  "model": "ollama/qwen2.5:32b",
+  "overall_f1": 0.06586802428828661,
+  "overall_em": 0.0,
+  "total_questions": 38,
+  "total_time_s": 720.0085670948029,
+  "by_category": {
+    "multi-hop": {
+      "f1": 0.06586802428828661,
+      "em": 0.0,
+      "count": 38
+    }
+  },
+  "results": [
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certifi",
+      "prediction": "Caroline would likely pursue c",
+      "f1": 0.125,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline still want to pursue counseling as a career if she hadn't received support growing up?",
+      "ground_truth": "Likely no",
+      "prediction": "Yes, given her active engageme",
+      "f1": 0.125,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline likely have Dr. Seuss books on her bookshelf?",
+      "ground_truth": "Yes, since she collects classi",
+      "prediction": "The provided information does ",
+      "f1": 0.1111111111111111,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline pursue writing as a career option?",
+      "ground_truth": "LIkely no; though she likes re",
+      "prediction": "The provided information does ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered a member of the LGBTQ community?",
+      "ground_truth": "Likely no, she does not refer ",
+      "prediction": "Not enough information to dete",
+      "f1": 0.2,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be more interested in going to a national park or a theme park?",
+      "ground_truth": "National park; she likes the o",
+      "prediction": "Melanie would be more interest",
+      "f1": 0.1,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie be considered an ally to the transgender community?",
+      "ground_truth": "Yes, she is supportive",
+      "prediction": "Insufficient information to de",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What would Caroline's political leaning likely be?",
+      "ground_truth": "Liberal",
+      "prediction": "Caroline likely leans progress",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Caroline be considered religious?",
+      "ground_truth": "Somewhat, but not extremely re",
+      "prediction": "No, Caroline's activities focu",
+      "f1": 0.10526315789473682,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Melanie likely enjoy the song \"The Four Seasons\" by Vivaldi?",
+      "ground_truth": "Yes; it's classical music",
+      "prediction": "No direct evidence shows Melan",
+      "f1": 0.26666666666666666,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What might John's financial status be?",
+      "ground_truth": "Middle-class or wealthy",
+      "prediction": "Insufficient financial details",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would John be considered a patriotic person?",
+      "ground_truth": "Yes",
+      "prediction": "John likes helping the communi",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What might John's degree be in?",
+      "ground_truth": "Political science, Public admi",
+      "prediction": "John's interest in mechanics a",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Around which US holiday did Maria get into a car accident?",
+      "ground_truth": "Independence Day",
+      "prediction": "There is not enough informatio",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Does John live close to a beach or the mountains?",
+      "ground_truth": "beach",
+      "prediction": "The information does not direc",
+      "f1": 0.11764705882352941,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would John be open to moving to another country?",
+      "ground_truth": "No, he has goals specifically ",
+      "prediction": "John enjoys helping the commun",
+      "f1": 0.20689655172413796,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What attributes describe John?",
+      "ground_truth": "Selfless, family-oriented, pas",
+      "prediction": "John is community-focused, enj",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What job might Maria pursue in the future?",
+      "ground_truth": "Shelter coordinator, Counselor",
+      "prediction": "Maria's volunteer work and int",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Is it likely that Nate has friends besides Joanna?",
+      "ground_truth": "Yesteammates on hisvideo game ",
+      "prediction": "Yes, Nate interacts with multi",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What pets wouldn't cause any discomfort to Joanna?",
+      "ground_truth": "Hairless cats or pigs,since th",
+      "prediction": "The provided conversations do ",
+      "f1": 0.13793103448275862,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What underlying condition might Joanna have based on her allergies?",
+      "ground_truth": "asthma",
+      "prediction": "Insufficient information provi",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What nickname does Nate use for Joanna?",
+      "ground_truth": "Jo",
+      "prediction": "There is no clear nickname for",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What Console does Nate own?",
+      "ground_truth": "A Nintendo Switch; since the g",
+      "prediction": "The provided conversations do ",
+      "f1": 0.09999999999999999,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What alternative career might Nate consider after gaming?",
+      "ground_truth": "an animalkeeper at a localzoo ",
+      "prediction": "Nate might consider a career i",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "How many hikes has Joanna been on?",
+      "ground_truth": "Four",
+      "prediction": "The information provided does ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What state did Joanna visit in summer 2021?",
+      "ground_truth": "Indiana",
+      "prediction": "There is not enough informatio",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Was the first half of September 2022 a good month career-wise for Nate and Joanna? Answer yes or no.",
+      "ground_truth": "No; because both of them faced",
+      "prediction": "No, the information does not i",
+      "f1": 0.08695652173913043,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What kind of job is Joanna beginning to preform the duties of because of her movie scripts?",
+      "ground_truth": "filmmaker.",
+      "prediction": "Joanna is beginning to write, ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Would Tim enjoy reading books by C. S. Lewis or John Greene?",
+      "ground_truth": "C. S.Lewis",
+      "prediction": "Tim would likely enjoy C. S. L",
+      "f1": 0.13333333333333336,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Based on Tim's collections, what is a shop that he would enjoy visiting in New York city?",
+      "ground_truth": "House of MinaLima",
+      "prediction": "Tim would enjoy visiting a fan",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Which outdoor gear company likely signed up John for an endorsement deal?",
+      "ground_truth": "Under Armour",
+      "prediction": "Not enough information provide",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Who is Anthony?",
+      "ground_truth": "likely John's friend, colleagu",
+      "prediction": "The provided conversations do ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What is a prominent charity organization that John might want to work with and why?",
+      "ground_truth": "Good Sports, because they work",
+      "prediction": "John might want to work with a",
+      "f1": 0.2,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Which popular time management technique does Tim use to prepare for exams?",
+      "ground_truth": "Pomodoro technique",
+      "prediction": "Tim uses the technique of brea",
+      "f1": 0.15384615384615385,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Which popular music composer's tunes does Tim enjoy playing on the piano?",
+      "ground_truth": "John Williams",
+      "prediction": "The provided conversations do ",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "Which US states might Tim be in during September 2023 based on his plans of visiting Universal Studios?",
+      "ground_truth": "California or Florida",
+      "prediction": "There is no direct evidence th",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What could John do after his basketball career?",
+      "ground_truth": "become a basketball coach sinc",
+      "prediction": "John could transition into spo",
+      "f1": 0.16666666666666666,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What kind of yoga for building core strength might John benefit from?",
+      "ground_truth": "Hatha Yoga",
+      "prediction": "Insufficient information provi",
+      "f1": 0.16666666666666669,
+      "em": false,
+      "category": "multi-hop"
+    }
+  ]
+}

@@ -344,12 +344,16 @@ class LoCoMoBenchmarkV4:
                 if duration_answer and 'unknown' not in duration_answer.lower():
                     return duration_answer
         
-        # Build context using multi-angle retrieval
-        context = retriever.build_context(
-            question,
-            max_results=20,
-            include_episodes=(category == 3),  # Include episodes for multi-hop
-        )
+        # For Multi-Hop, use the new Reasoner
+        if category == 3:
+            context = memory.reasoner.build_reasoning_context(question)
+        else:
+            # Build context using multi-angle retrieval
+            context = retriever.build_context(
+                question,
+                max_results=20,
+                include_episodes=False, 
+            )
         
         if not context:
             return "Not mentioned"

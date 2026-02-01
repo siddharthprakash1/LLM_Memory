@@ -1,0 +1,102 @@
+{
+  "version": "v4",
+  "model": "ollama/qwen2.5:32b",
+  "overall_f1": 0.23443223443223443,
+  "overall_em": 0.1,
+  "total_questions": 10,
+  "total_time_s": 9982.807646036148,
+  "by_category": {
+    "single-hop": {
+      "f1": 0.2738095238095238,
+      "em": 0.125,
+      "count": 8
+    },
+    "multi-hop": {
+      "f1": 0.07692307692307693,
+      "em": 0.0,
+      "count": 2
+    }
+  },
+  "results": [
+    {
+      "question": "What fields would Caroline be likely to pursue in her educaton?",
+      "ground_truth": "Psychology, counseling certifi",
+      "prediction": "Caroline's dedication to helpi",
+      "f1": 0.0,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What did Caroline research?",
+      "ground_truth": "Adoption agencies",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's identity?",
+      "ground_truth": "Transgender woman",
+      "prediction": "transgender woman",
+      "f1": 1.0,
+      "em": true,
+      "category": "single-hop"
+    },
+    {
+      "question": "What is Caroline's relationship status?",
+      "ground_truth": "Single",
+      "prediction": "Married",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where did Caroline move from 4 years ago?",
+      "ground_truth": "Sweden",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What career path has Caroline decided to persue?",
+      "ground_truth": "counseling or mental health fo",
+      "prediction": "counseling and mental healthca",
+      "f1": 0.3333333333333333,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Would Caroline still want to pursue counseling as a career if she hadn't received support growing up?",
+      "ground_truth": "Likely no",
+      "prediction": "No, Caroline's support system ",
+      "f1": 0.15384615384615385,
+      "em": false,
+      "category": "multi-hop"
+    },
+    {
+      "question": "What activities does Melanie partake in?",
+      "ground_truth": "pottery, camping, painting, sw",
+      "prediction": "painting, pottery, camping",
+      "f1": 0.8571428571428571,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "Where has Melanie camped?",
+      "ground_truth": "beach, mountains, forest",
+      "prediction": "Not mentioned",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    },
+    {
+      "question": "What do Melanie's kids like?",
+      "ground_truth": "dinosaurs, nature",
+      "prediction": "summer break, swimming, potter",
+      "f1": 0.0,
+      "em": false,
+      "category": "single-hop"
+    }
+  ]
+}

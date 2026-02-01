@@ -71,6 +71,10 @@ class MemoryStoreV4:
         self.conflict_resolver = ConflictResolver()
         self.temporal_tracker = TemporalStateTracker()
         
+        # Initialize Reasoner (lazy load to avoid circular import issues if any)
+        from .multi_hop import MultiHopReasoner
+        self.reasoner = MultiHopReasoner(self)
+        
         # Primary stores
         self.facts: Dict[str, ExtractedFact] = {}  # fact_id -> fact
         self.episodes: Dict[str, Episode] = {}     # episode_id -> episode
@@ -456,6 +460,10 @@ class MemoryStoreV4:
         
         This is what gets sent to the LLM.
         """
+        # If question is complex (multi-hop), use reasoner
+        if any(w in question.lower() for w in ['would', 'why', 'how', 'compare', 'both', 'common']):
+            return self.reasoner.build_reasoning_context(question)
+            
         parts = []
         
         # Get relevant facts

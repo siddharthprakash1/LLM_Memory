@@ -52,6 +52,20 @@ def test_keyword_search(memory_store):
     assert len(results) >= 1
     assert "hiking" in results[0].content
 
+def test_keyword_search_me(memory_store):
+    # Add fact about User
+    # Note: LLM extraction might normalize "User" to "User" or keep as is.
+    # The normalizer maps "I" to speaker.
+    # If speaker is "User", then "I like hiking" -> "User likes hiking"
+    ep, facts = memory_store.add_conversation_turn("User", "I like hiking", "2023-01-01")
+    
+    retriever = create_retriever(memory_store)
+    
+    # Query about "me" should find "User" facts
+    results = retriever._keyword_search("what do you know about me", top_k=5)
+    assert len(results) >= 1
+    assert "hiking" in results[0].content
+
 def test_semantic_search(memory_store):
     retriever = create_retriever(memory_store)
     
