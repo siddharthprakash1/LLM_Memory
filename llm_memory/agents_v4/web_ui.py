@@ -447,6 +447,10 @@ def chat():
     # In a real app, this would come from the client/cookie
     thread_id = "web_session_1"
     
+    # Get current state to check if we have history
+    # This ensures we don't overwrite the state, but append to it
+    config = {"configurable": {"thread_id": thread_id}}
+    
     inputs = {
         "messages": [HumanMessage(content=message)],
         "user_id": "default",
@@ -455,7 +459,7 @@ def chat():
     
     # Run graph with config
     response_text = ""
-    for event in agent.graph.stream(inputs, config={"configurable": {"thread_id": thread_id}}):
+    for event in agent.graph.stream(inputs, config=config):
         for key, value in event.items():
             if key == "agent":
                 response_text = value["messages"][0].content

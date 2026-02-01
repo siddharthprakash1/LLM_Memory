@@ -37,7 +37,10 @@ class QueryDecomposer:
     RULES:
     1. Each step must be a simple question about a specific entity or relationship.
     2. Steps should be logical: find A -> find connection to B -> conclude.
-    3. Output JSON format only.
+    3. If the question asks for a prediction (e.g., "Would X like Y?"), break it into:
+       - "What are X's interests?"
+       - "Is Y related to X's interests?"
+    4. Output JSON format only.
     
     EXAMPLE 1:
     Question: "Would Caroline like a trip to the Alps?"
@@ -56,6 +59,16 @@ class QueryDecomposer:
             "Did Caroline go to a coffee shop?",
             "Who did Caroline meet recently?",
             "What events happened at a coffee shop?"
+        ]
+    }
+    
+    EXAMPLE 3:
+    Question: "What console does Nate own?"
+    Output: {
+        "steps": [
+            "Does Nate play video games?",
+            "What games does Nate play?",
+            "What gaming hardware or console does Nate have?"
         ]
     }
     """
@@ -111,37 +124,54 @@ class MultiHopReasoner:
         
         # 2. Iterative Retrieval
         for i, sub_q in enumerate(sub_questions):
-            # Retrieve facts for this step
-            results = self.retriever.retrieve(sub_q, top_k=5)
+            # Use Advanced Retrieval (Expansion + HyDE) for each step
+            # We can reuse the logic in memory_store.build_context_for_question but scoped to this sub-query
+            # Or call the advanced_retriever directly if we want more control
             
-            # Filter unique facts
-            new_facts = []
-            for r in results:
-                if r.content not in accumulated_context:
-                    new_facts.append(r.content)
-                    accumulated_context.add(r.content)
+            # Let's use the memory store's search which now includes expansion
+            # But we need to be careful not to recurse infinitely if we call build_context_for_question
+            # So we'll use the advanced_retriever directly here
+            
+            # Expand sub-query
+            queries = self.memory.advanced_retriever.expand_query(sub_q)
+            hyde_doc = self.memory.advanced_retriever.generate_hyde_doc(sub_q)
+            
+            step_facts = []
+            
+            # Search with original + expansion + HyDE
+            # Increase top_k for better recall
+            search_queries = [sub_q, hyde_doc] + queries[:2]
+            
+            for q in search_queries:
+                results = self.retriever.retrieve(q, top_k=10) # Increased from 5
+                for r in results:
+                    if r.content not in accumulated_context:
+                        step_facts.append(r.content)
+                        accumulated_context.add(r.content)
             
             # Record step
             step = ReasoningStep(
                 step_id=i+1,
                 question=sub_q,
-                retrieved_facts=new_facts,
+                retrieved_facts=step_facts,
                 conclusion="" # Filled later if needed
             )
             trace.append(step)
             
             # If we found nothing, try graph expansion on entities in sub_q
-            if not new_facts:
+            # Increase depth/neighbors
+            if not step_facts:
                 entities = self.retriever._extract_entities(sub_q)
                 for entity in entities:
                     # Graph search for neighbors
-                    graph_results = self.retriever._graph_search(entity, top_k=3)
+                    # Increase top_k here too
+                    graph_results = self.retriever._graph_search(entity, top_k=5) # Increased from 3
                     for gr in graph_results:
                         if gr.content not in accumulated_context:
-                            new_facts.append(gr.content)
+                            step_facts.append(gr.content)
                             accumulated_context.add(gr.content)
-                    if new_facts:
-                        step.retrieved_facts.extend(new_facts)
+                    if step_facts:
+                        step.retrieved_facts.extend(step_facts)
                         break
         
         # 3. Synthesis (Final Answer)
@@ -151,6 +181,21 @@ class MultiHopReasoner:
     def build_reasoning_context(self, query: str) -> str:
         """Build a rich context string with reasoning trace."""
         context, trace = self.answer_complex_question(query)
+        
+        # Log for visualization
+        if hasattr(self.memory, 'reasoning_logs'):
+            steps_log = [s.question for s in trace]
+            self.memory.reasoning_logs.append({
+                "type": "DECOMPOSE",
+                "steps": steps_log
+            })
+            
+            for step in trace:
+                self.memory.reasoning_logs.append({
+                    "type": "RETRIEVE",
+                    "query": step.question,
+                    "count": len(step.retrieved_facts)
+                })
         
         output = ["REASONING CHAIN:"]
         for step in trace:

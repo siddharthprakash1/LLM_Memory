@@ -71,9 +71,16 @@ class MemoryStoreV4:
         self.conflict_resolver = ConflictResolver()
         self.temporal_tracker = TemporalStateTracker()
         
+        # Initialize Advanced Retriever
+        from .advanced_retrieval import AdvancedRetriever
+        self.advanced_retriever = AdvancedRetriever(model_name, ollama_url)
+        
         # Initialize Reasoner (lazy load to avoid circular import issues if any)
         from .multi_hop import MultiHopReasoner
         self.reasoner = MultiHopReasoner(self)
+        
+        # Reasoning logs for visualization
+        self.reasoning_logs = []
         
         # Primary stores
         self.facts: Dict[str, ExtractedFact] = {}  # fact_id -> fact
@@ -464,14 +471,46 @@ class MemoryStoreV4:
         if any(w in question.lower() for w in ['would', 'why', 'how', 'compare', 'both', 'common']):
             return self.reasoner.build_reasoning_context(question)
             
+        # For Single-Hop, use Advanced Retrieval (Expansion + HyDE)
+        # 1. Expand Query
+        queries = self.advanced_retriever.expand_query(question)
+        
+        # 2. Generate HyDE doc (optional, can be expensive, let's use it for the main query)
+        hyde_doc = self.advanced_retriever.generate_hyde_doc(question)
+        
         parts = []
         
-        # Get relevant facts
-        facts_with_scores = self.search_facts(question, top_k=max_facts)
+        # 3. Retrieve using all queries + HyDE
+        # We'll use the search_facts method for each
+        all_results = []
+        seen_ids = set()
         
-        if facts_with_scores:
+        # Search with original query (highest weight)
+        for fact, score in self.search_facts(question, top_k=max_facts):
+            if fact.fact_id not in seen_ids:
+                all_results.append((fact, score * 1.5)) # Boost original query
+                seen_ids.add(fact.fact_id)
+                
+        # Search with HyDE doc
+        for fact, score in self.search_facts(hyde_doc, top_k=max_facts):
+            if fact.fact_id not in seen_ids:
+                all_results.append((fact, score * 1.2)) # Boost HyDE
+                seen_ids.add(fact.fact_id)
+                
+        # Search with expanded queries
+        for q in queries[1:]: # Skip original (already done)
+            for fact, score in self.search_facts(q, top_k=10):
+                if fact.fact_id not in seen_ids:
+                    all_results.append((fact, score * 0.8)) # Lower weight for expansions
+                    seen_ids.add(fact.fact_id)
+        
+        # Sort and take top K
+        all_results.sort(key=lambda x: x[1], reverse=True)
+        top_results = all_results[:max_facts]
+        
+        if top_results:
             parts.append("FACTS:")
-            for fact, score in facts_with_scores:
+            for fact, score in top_results:
                 statement = fact.as_statement()
                 if fact.source_date:
                     statement += f" [{fact.source_date}]"
@@ -492,7 +531,7 @@ class MemoryStoreV4:
         if include_episodes:
             # Get speakers mentioned in question
             speakers = set()
-            for fact, _ in facts_with_scores[:5]:
+            for fact, _ in top_results[:5]:
                 if fact.source_speaker:
                     speakers.add(fact.source_speaker)
             
