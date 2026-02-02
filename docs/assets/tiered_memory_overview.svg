@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="560" viewBox="0 0 1200 560">
+  <defs>
+    <style>
+      .bg { fill: #0b1220; }
+      .card { fill: #111a2e; stroke: #223255; stroke-width: 2; rx: 18; }
+      .title { fill: #e5e7eb; font: 800 26px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .sub { fill: #a7b0c0; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .h { fill: #e5e7eb; font: 800 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .t { fill: #cbd5e1; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .muted { fill: #8b9bb8; font: 500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .pill { fill: #1f2a44; stroke: #2f4270; stroke-width: 1.5; rx: 999; }
+      .arrow { stroke: #8b9bb8; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#8b9bb8"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="560"/>
+  <text class="title" x="40" y="58">Tiered Memory System (STM � Episodic � Semantic)</text>
+  <text class="sub" x="40" y="86">This is the hierarchical memory stack in llm_memory/api + llm_memory/models + consolidation/decay/conflict + retrieval/RAG</text>
+
+  <!-- Tiers -->
+  <rect class="card" x="40" y="120" width="360" height="360"/>
+  <text class="h" x="70" y="160">Short-Term Memory (STM)</text>
+  <text class="t" x="70" y="188">Session buffer (messages)</text>
+  <rect class="pill" x="70" y="215" width="300" height="44"/>
+  <text class="t" x="90" y="244">Fast decay + eviction</text>
+  <rect class="pill" x="70" y="270" width="300" height="44"/>
+  <text class="t" x="90" y="299">Token / item caps</text>
+  <text class="muted" x="70" y="340">File: llm_memory/models/short_term.py</text>
+
+  <rect class="card" x="420" y="120" width="360" height="360"/>
+  <text class="h" x="450" y="160">Episodic Memory</text>
+  <text class="t" x="450" y="188">Events + temporal context</text>
+  <rect class="pill" x="450" y="215" width="300" height="44"/>
+  <text class="t" x="470" y="244">Medium decay</text>
+  <rect class="pill" x="450" y="270" width="300" height="44"/>
+  <text class="t" x="470" y="299">Narratives + lessons</text>
+  <text class="muted" x="450" y="340">File: llm_memory/models/episodic.py</text>
+
+  <rect class="card" x="800" y="120" width="360" height="360"/>
+  <text class="h" x="830" y="160">Semantic Memory</text>
+  <text class="t" x="830" y="188">Facts + concepts + relations</text>
+  <rect class="pill" x="830" y="215" width="300" height="44"/>
+  <text class="t" x="850" y="244">Slow decay</text>
+  <rect class="pill" x="830" y="270" width="300" height="44"/>
+  <text class="t" x="850" y="299">Knowledge graph primitives</text>
+  <text class="muted" x="830" y="340">File: llm_memory/models/semantic.py</text>
+
+  <!-- Arrows -->
+  <path class="arrow" d="M400 300 C410 300, 410 300, 420 300"/>
+  <path class="arrow" d="M780 300 C790 300, 790 300, 800 300"/>
+
+  <!-- Bottom: services -->
+  <rect class="card" x="40" y="500" width="1120" height="40"/>
+  <text class="t" x="70" y="526">Cross-cutting: decay (llm_memory/decay), consolidation (llm_memory/consolidation), conflict (llm_memory/conflict), retrieval+RAG (llm_memory/retrieval)</text>
+</svg>

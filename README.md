@@ -36,6 +36,8 @@
 
 ![Benchmark snapshot](docs/assets/benchmark_snapshot.svg)
 
+![Tiered memory overview](docs/assets/tiered_memory_overview.svg)
+
 > Replace these SVGs with real screenshots later (same paths keep the README stable).
 
 ---
@@ -76,6 +78,21 @@ This repo takes a **facts-first** approach:
 | **Episode** | SQLite | Raw/provenance “what was said” | `speaker`, `original_text`, `normalized_text`, `date`, `fact_ids` |
 | **Temporal State** | SQLite + tracker | Computable durations / “since/ago/for” | `state_type`, `start_date`, `duration_*`, `duration_text` |
 | **Graph edge** | Derived from facts | Entity linking for graph traversal | `subject ↔ object` (via facts) |
+
+---
+
+## Two memory stacks in this repo (important)
+
+This repository currently contains **two different memory implementations**:
+
+| Stack | Primary representation | Best for | Main entrypoints |
+|---|---|---|---|
+| **Tiered Memory System** (hierarchical STM→Episodic→Semantic) | `BaseMemory` objects + embeddings + consolidation/decay/conflict | “General-purpose” agent memory + RAG workflows + benchmark suite | `llm_memory/api/memory_system.py`, `llm_memory/retrieval/rag_pipeline.py` |
+| **Memory V4 (facts-first)** | Extracted facts + episodes + temporal states (SQLite tables) | Inspectable fact-graph building, temporal Qs, LOCOMO-style provenance | `llm_memory/memory_v4/memory_store.py`, `llm_memory/memory_v4/retrieval.py` |
+
+If you’re reading the code:
+- `benchmarks/benchmark_memory.py` evaluates the **Tiered Memory System** (via `MemorySystemAdapter`).
+- `benchmarks/locomo_v4.py` evaluates **Memory V4**.
 
 ---
 
@@ -185,6 +202,63 @@ flowchart LR
   RC -->|not enough| D
 ```
 
+### Tiered memory stack (STM → Episodic → Semantic)
+
+```mermaid
+flowchart TB
+  M["User input / events"] --> STM["Short-Term Memory (session buffer)"]
+  STM -->|"promote"| EP["Episodic Memory (events + temporal context)"]
+  EP -->|"pattern extraction"| SEM["Semantic Memory (facts + concepts)"]
+
+  subgraph CrossCutting["Cross-cutting services"]
+    DECAY["Decay (forgetting curves)"]
+    IMP["Importance scoring"]
+    CONS["Consolidation scheduler"]
+    CONFLICT["Conflict detection + resolution"]
+  end
+
+  DECAY --> STM
+  DECAY --> EP
+  DECAY --> SEM
+  IMP --> STM
+  IMP --> EP
+  IMP --> SEM
+  CONS --> STM
+  CONS --> EP
+  CONFLICT --> SEM
+```
+
+### Production RAG pipeline (Tiered stack)
+
+```mermaid
+flowchart LR
+  Q0["Query"] --> INT["Intent classifier"]
+  INT --> EMB["Embed query"]
+  EMB --> VS["Vector search (Chroma)"]
+  Q0 --> KS["Keyword overlap"]
+  VS --> HYB["Hybrid combine"]
+  KS --> HYB
+  HYB --> TEMP["Temporal re-rank"]
+  TEMP -->|"complex"| MH["Multi-hop reasoner"]
+  TEMP -->|"simple"| SYN["Answer synthesis (LLM)"]
+  MH --> SYN
+  SYN --> OUT["Answer + sources + confidence"]
+```
+
+### Benchmark runner loop (how scores are produced)
+
+```mermaid
+flowchart TB
+  CLI["benchmarks/benchmark_memory.py"] --> RUN["BenchmarkRunner.run_all()"]
+  RUN --> SCEN["Scenario generates samples"]
+  SCEN --> STORE["Store context memories (latency)"]
+  STORE --> RET["Retrieve for query (latency)"]
+  RET --> EVAL["Evaluate (EM / Contains / F1)"]
+  EVAL --> AGG["Aggregate runs (mean/std)"]
+  AGG --> OUTJ["Write JSON report"]
+  AGG --> OUTM["Write Markdown report"]
+```
+
 ---
 
 ## Benchmarks (two layers)
@@ -274,6 +348,59 @@ This project writes local state while you run it:
 | Benchmark visualizer DB | `./benchmark_viz_memory/` | DB used by `benchmark_viz.py` |
 
 Tip: these paths are **intentionally gitignored** (see `.gitignore`).
+
+---
+
+## Storage schemas (nitty‑gritty)
+
+### Memory V4 SQLite tables (facts-first)
+
+Defined in `llm_memory/memory_v4/memory_store.py`:
+
+| Table | Purpose | Notable columns |
+|---|---|---|
+| `facts` | Structured facts with provenance and “current vs superseded” | `fact_id`, `fact_type`, `subject`, `predicate`, `object`, `source_date`, `is_current`, `superseded_by` |
+| `episodes` | Raw turns + normalized text + which facts came from them | `episode_id`, `speaker`, `original_text`, `normalized_text`, `date`, `fact_ids` |
+| `temporal_states` | Parsed temporal state for duration questions | `state_id`, `subject`, `state_type`, `start_date`, `duration_*`, `duration_text`, `is_current` |
+
+### Tiered system SQLite schema (generic memory metadata)
+
+Defined in `llm_memory/storage/sqlite.py` (`SCHEMA`):
+
+| Table | Purpose |
+|---|---|
+| `memories` | Main storage for all tiers (STM/Episodic/Semantic), with JSON columns |
+| `memory_relationships` | Graph edges between memories (typed, weighted) |
+| `memory_tags` | Tag index table |
+| `stats` | Storage stats key/value |
+
+---
+
+## Configuration knobs (what to tune)
+
+### Tiered Memory System (`llm_memory/api/memory_system.py`)
+
+| Setting | Default | Effect |
+|---|---:|---|
+| `enable_embeddings` | true | Generate embeddings for retrieval |
+| `enable_summarization` | true | Summarize long memories |
+| `enable_consolidation` | true | Allow promotions + GC |
+| `enable_conflict_resolution` | true | Detect/resolve contradictions |
+| `auto_consolidate` | false | Run consolidation scheduler automatically |
+| `consolidation_interval_seconds` | 300 | Background consolidation frequency |
+| `use_persistent_storage` | false | Persist memories via SQLiteStorage |
+| `storage_path` | `./data/memory.db` | DB path for tiered stack |
+
+### RAG Pipeline (`llm_memory/retrieval/rag_pipeline.py`)
+
+| Setting | Default | Effect |
+|---|---:|---|
+| `top_k` | 10 | Max sources used |
+| `use_hybrid_search` | true | Vector + keyword |
+| `enable_temporal_scoring` | true | Prefer recent / time-relevant |
+| `enable_multi_hop` | true | Iterative retrieval for complex queries |
+| `multi_hop_threshold` | 12 | Word-count threshold to trigger |
+| `max_hops` | 3 | Depth of multi-hop reasoning |
 
 ---
 
