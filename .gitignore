@@ -31,3 +31,8 @@ benchmark_mem_v4/
 benchmark_viz_memory/
 ui_agent_memory/
 flask_agent_memory/
+longmemeval_memory/
+
+# Large dataset files (download separately)
+benchmarks/datasets/longmemeval/*.json
+benchmarks/datasets/longmemeval/*.jsonl

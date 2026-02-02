@@ -544,6 +544,68 @@ class MemoryStoreV4:
         
         return "\n".join(parts)
     
+    def answer_question(self, question: str, max_context_length: int = 2000) -> str:
+        """
+        Answer a question using the memory.
+        
+        This uses the advanced retriever to build context and the LLM to generate an answer.
+        """
+        # Build context
+        context = self.advanced_retriever.build_context(
+            question=question,
+            max_facts=20,
+            include_episodes=True,
+        )
+        
+        # If no context found, try multi-hop reasoning
+        if not context or len(context) < 50:
+            # Use reasoner
+            answer_text, steps = self.reasoner.answer(question)
+            return answer_text if answer_text else "I don't have enough information to answer that question."
+        
+        # Build prompt for LLM
+        prompt = f"""Based on the following memory context, answer the question concisely and accurately.
+
+MEMORY CONTEXT:
+{context[:max_context_length]}
+
+QUESTION: {question}
+
+ANSWER (be concise and specific):"""
+        
+        # Call LLM
+        try:
+            import requests
+            response = requests.post(
+                f"{self.extractor.ollama_url}/api/generate",
+                json={
+                    "model": self.extractor.model_name,
+                    "prompt": prompt,
+                    "stream": False,
+                    "options": {
+                        "temperature": 0.3,
+                        "num_predict": 150,
+                    }
+                },
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                answer = result.get("response", "").strip()
+                return answer if answer else "I don't have enough information to answer that question."
+            else:
+                return "Error generating answer."
+        
+        except Exception as e:
+            print(f"Error calling LLM: {e}")
+            # Fallback to context-based answer
+            return context[:200] + "..."
+    
+    def count_facts(self) -> int:
+        """Count total number of facts."""
+        return len(self.facts)
+    
     # ===========================================
     # STATISTICS
     # ===========================================
