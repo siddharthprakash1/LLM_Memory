@@ -1,0 +1,89 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .bg { fill: #0b1220; }
+      .card { fill: #111a2e; stroke: #223255; stroke-width: 2; rx: 18; }
+      .title { fill: #e5e7eb; font: 700 26px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .sub { fill: #a7b0c0; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .h { fill: #e5e7eb; font: 700 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .t { fill: #cbd5e1; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .pill { fill: #1f2a44; stroke: #2f4270; stroke-width: 1.5; rx: 999; }
+      .arrow { stroke: #8b9bb8; stroke-width: 2.5; fill: none; marker-end: url(#m); }
+      .muted { fill: #8b9bb8; font: 500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+    </style>
+    <marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <path d="M0,0 L10,3 L0,6 Z" fill="#8b9bb8"/>
+    </marker>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="520"/>
+
+  <text class="title" x="40" y="58">LLM Memory V4  Architecture Overview</text>
+  <text class="sub" x="40" y="86">Ingest � Extract Facts � Resolve Conflicts � Store (Facts/Episodes/Temporal/Graph) � Retrieve + Reason � Answer</text>
+
+  <!-- Left: Ingestion -->
+  <rect class="card" x="40" y="120" width="350" height="340"/>
+  <text class="h" x="70" y="160">Ingestion Pipeline</text>
+
+  <rect class="pill" x="70" y="185" width="290" height="44"/>
+  <text class="t" x="90" y="214">1) Normalize text</text>
+  <text class="muted" x="240" y="214">timestamps " pronouns</text>
+
+  <rect class="pill" x="70" y="245" width="290" height="44"/>
+  <text class="t" x="90" y="274">2) Extract structured facts</text>
+  <text class="muted" x="250" y="274">S-P-O triples</text>
+
+  <rect class="pill" x="70" y="305" width="290" height="44"/>
+  <text class="t" x="90" y="334">3) Resolve conflicts</text>
+  <text class="muted" x="250" y="334">updates " contradictions</text>
+
+  <rect class="pill" x="70" y="365" width="290" height="44"/>
+  <text class="t" x="90" y="394">4) Persist + index</text>
+  <text class="muted" x="235" y="394">facts " episodes " time</text>
+
+  <!-- Middle: Memory Store -->
+  <rect class="card" x="425" y="120" width="350" height="340"/>
+  <text class="h" x="455" y="160">Memory Store</text>
+
+  <rect class="pill" x="455" y="190" width="290" height="52"/>
+  <text class="t" x="475" y="220">Facts (SQLite)</text>
+  <text class="muted" x="610" y="220">current + provenance</text>
+
+  <rect class="pill" x="455" y="255" width="290" height="52"/>
+  <text class="t" x="475" y="285">Episodes (raw turns)</text>
+  <text class="muted" x="615" y="285">audit trail</text>
+
+  <rect class="pill" x="455" y="320" width="290" height="52"/>
+  <text class="t" x="475" y="350">Temporal states</text>
+  <text class="muted" x="605" y="350">durations " changes</text>
+
+  <rect class="pill" x="455" y="385" width="290" height="52"/>
+  <text class="t" x="475" y="415">Knowledge graph</text>
+  <text class="muted" x="610" y="415">entity links</text>
+
+  <!-- Right: Retrieval & Reasoning -->
+  <rect class="card" x="810" y="120" width="350" height="340"/>
+  <text class="h" x="840" y="160">Retrieval + Reasoning</text>
+
+  <rect class="pill" x="840" y="190" width="290" height="52"/>
+  <text class="t" x="860" y="220">Multi-angle retrieval</text>
+  <text class="muted" x="1000" y="220">keyword " graph " time</text>
+
+  <rect class="pill" x="840" y="255" width="290" height="52"/>
+  <text class="t" x="860" y="285">Query expansion + HyDE</text>
+  <text class="muted" x="1035" y="285">recall boost</text>
+
+  <rect class="pill" x="840" y="320" width="290" height="52"/>
+  <text class="t" x="860" y="350">Multi-hop planner</text>
+  <text class="muted" x="1015" y="350">decompose � retrieve</text>
+
+  <rect class="pill" x="840" y="385" width="290" height="52"/>
+  <text class="t" x="860" y="415">Answer synthesis</text>
+  <text class="muted" x="1000" y="415">grounded in facts</text>
+
+  <!-- Arrows between cards -->
+  <path class="arrow" d="M390 290 C410 290, 410 290, 425 290"/>
+  <path class="arrow" d="M775 290 C795 290, 795 290, 810 290"/>
+
+  <text class="muted" x="520" y="492">Tip: embed this in the README and keep Mermaid for source-of-truth diagrams.</text>
+</svg>

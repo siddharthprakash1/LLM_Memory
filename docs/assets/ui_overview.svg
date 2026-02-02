@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .bg { fill: #0b1220; }
+      .panel { fill: #111a2e; stroke: #223255; stroke-width: 2; rx: 18; }
+      .title { fill: #e5e7eb; font: 700 26px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .sub { fill: #a7b0c0; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .h { fill: #e5e7eb; font: 700 16px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .t { fill: #cbd5e1; font: 500 13px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .chip { fill: #1f2a44; stroke: #2f4270; stroke-width: 1.5; rx: 999; }
+      .muted { fill: #8b9bb8; font: 500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="520"/>
+
+  <text class="title" x="40" y="58">Web UI  What you see while memory forms</text>
+  <text class="sub" x="40" y="86">Chat on the left, brain panels on the right (Facts " Graph " Timeline)</text>
+
+  <!-- Sidebar -->
+  <rect class="panel" x="40" y="120" width="240" height="340"/>
+  <text class="h" x="70" y="160">Sidebar</text>
+  <rect class="chip" x="70" y="185" width="180" height="40"/>
+  <text class="t" x="90" y="210">Stats</text>
+  <rect class="chip" x="70" y="240" width="180" height="40"/>
+  <text class="t" x="90" y="265">Reset memory</text>
+  <text class="muted" x="70" y="310">Total facts " episodes " temporal</text>
+
+  <!-- Chat -->
+  <rect class="panel" x="310" y="120" width="560" height="340"/>
+  <text class="h" x="340" y="160">Chat</text>
+  <rect class="chip" x="340" y="185" width="500" height="44"/>
+  <text class="t" x="360" y="214">User: I moved to Bangalore 3 years ago.</text>
+  <rect class="chip" x="340" y="245" width="500" height="44"/>
+  <text class="t" x="360" y="274">Agent: grounded answer + asks clarifying Qs</text>
+  <text class="muted" x="340" y="320">Every turn triggers extraction + memory update.</text>
+
+  <!-- Brain panels -->
+  <rect class="panel" x="900" y="120" width="260" height="340"/>
+  <text class="h" x="930" y="160">Brain Panel</text>
+  <rect class="chip" x="930" y="185" width="200" height="36"/>
+  <text class="t" x="950" y="209">Facts</text>
+  <rect class="chip" x="930" y="230" width="200" height="36"/>
+  <text class="t" x="950" y="254">Graph</text>
+  <rect class="chip" x="930" y="275" width="200" height="36"/>
+  <text class="t" x="950" y="299">Timeline</text>
+  <text class="muted" x="930" y="340">Watch nodes/edges grow live.</text>
+
+  <text class="muted" x="40" y="492">Replace this SVG with real screenshots once you capture them (same relative paths keep working).</text>
+</svg>

@@ -1,174 +1,193 @@
-# 🧠 LLM Memory V4: Hierarchical Cognitive Architecture for Agents
+# LLM Memory — “real memory”, not chat history
 
-> **"Everyone says 'memory', nobody builds retrieval-aware, decaying, scoped memory."**
+**LLM Memory** is a local-first memory system for agents that stores *structured facts + provenance + temporal state* and retrieves them with multi-angle search and multi-hop reasoning. It’s built to be inspectable: you can **watch facts and the graph form in the UI** as you chat or as you replay benchmark conversations.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Benchmark: SOTA](https://img.shields.io/badge/Temporal_Reasoning-SOTA-success)](https://github.com/yourusername/llm-memory)
-
-A production-grade memory system for autonomous agents that goes beyond simple vector storage. It implements **human-like cognitive processes**: memory decay, conflict resolution, temporal reasoning, and multi-angle retrieval.
+[![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue.svg)](https://www.python.org/downloads/)
+[![Ollama](https://img.shields.io/badge/LLM-Ollama-black.svg)](https://ollama.com/)
 
 ---
 
-## 🚀 Key Features
+## Visual tour (UI + architecture)
 
-| Feature | Description | Why it matters |
-| :--- | :--- | :--- |
-| **🧠 LLM Fact Extraction** | Extracts structured facts (`Subject -> Predicate -> Object`) at ingest time using LLMs. | Turns unstructured chat into a queryable Knowledge Graph. |
-| **⏳ Temporal Reasoning** | Tracks state changes over time (e.g., "lived in NY for 4 years"). | Answers "How long?" and "When?" questions accurately (**Beats SOTA benchmarks**). |
-| **⚔️ Conflict Resolution** | Detects contradictions and updates outdated facts. | Prevents the agent from having conflicting beliefs (e.g., "I am single" vs "I am married"). |
-| **🕸️ Multi-Angle Retrieval** | Combines Keyword, Semantic, Graph, and Temporal search. | Finds information even when keywords don't match exactly. |
-| **📉 Memory Decay** | Implements Ebbinghaus forgetting curves. | Prioritizes recent and important memories, just like humans. |
-| **🤖 LangGraph Agent** | Built-in agent framework with implicit memory loading. | Ready-to-use agent that "remembers" you instantly. |
+![Architecture overview](docs/assets/architecture_overview.svg)
+
+![UI overview](docs/assets/ui_overview.svg)
+
+> Replace these SVGs with real screenshots later (same paths keep the README stable).
 
 ---
 
-## 📊 Benchmark Results (LOCOMO)
+## What you get
 
-We benchmarked Memory V4 against the **LOCOMO** dataset, a rigorous standard for long-term memory.
-
-| Category | Reference Score (F1) | **Memory V4 Score** | Status |
-| :--- | :--- | :--- | :--- |
-| **Temporal Reasoning** | 0.520 | **0.621** 🚀 | **+19.4% (SOTA)** |
-| **Single-Hop QA** | 0.500 | *0.224* | *Optimizing* |
-| **Multi-Hop QA** | 0.400 | *In Progress* | *Optimizing* |
-
-> **Highlight:** Our Temporal Engine significantly outperforms the reference implementation, solving the hardest problem in LLM memory: understanding time.
-
----
-
-## 🏗️ Architecture
-
-The system follows a **CORE-style** (Cognitive Retrieval) architecture:
-
-```mermaid
-graph TD
-    User[User Input] --> Norm[Text Normalizer]
-    Norm --> Extract[LLM Fact Extractor]
-    Extract --> Resolve[Conflict Resolver]
-    
-    subgraph "Memory Store"
-        Resolve --> Facts["Fact Store (SQL)"]
-        Resolve --> Graph[Knowledge Graph]
-        Resolve --> Temporal[Temporal State Tracker]
-        Norm --> Episodes["Episodic Store (Raw)"]
-    end
-    
-    subgraph "Retrieval Engine"
-        Query[User Query] --> Intent[Intent Classifier]
-        Intent --> MultiSearch[Multi-Angle Search]
-        MultiSearch --> Rerank[Re-Ranker]
-        Facts --> MultiSearch
-        Graph --> MultiSearch
-        Temporal --> MultiSearch
-    end
-    
-    Rerank --> Context[Context Window]
-    Context --> Agent[LLM Agent]
-```
-
-### 1. Ingestion Pipeline
-1.  **Normalization**: Cleans timestamps, resolves pronouns (e.g., "I" -> "User").
-2.  **Extraction**: LLM converts text to structured facts (`User -> likes -> Hiking`).
-3.  **Resolution**: Checks if this contradicts or updates existing facts.
-4.  **Storage**: Saves to SQL (structured) and Vector (semantic) stores.
-
-### 2. Retrieval Pipeline
-1.  **Intent Classification**: Is the user asking for a fact, a duration, or a summary?
-2.  **Multi-Search**: Runs parallel searches (Keyword, Vector, Graph Traversal).
-3.  **Temporal Calculation**: Computes durations on-the-fly (e.g., "4 years ago" -> "2022").
-4.  **Re-ranking**: Sorts results by relevance, recency, and importance.
+| Capability | What it does | Why it matters |
+|---|---|---|
+| **LLM-backed fact extraction** | Turns unstructured turns into granular facts (S–P–O + metadata). | Enables grounded answers + graph building. |
+| **Conflict resolution** | Detects updates / contradictions and marks stale facts non-current. | Prevents “double beliefs”. |
+| **Temporal state tracking** | Models “since/for/ago” and duration questions. | “How long?” becomes computable, not guessed. |
+| **Multi-angle retrieval** | Keyword + graph traversal + temporal lookup (and more). | Recall stays high even with phrasing drift. |
+| **Multi-hop reasoning** | Decomposes complex questions and iteratively retrieves. | Helps with questions requiring chaining. |
+| **Inspectable UI** | Facts, graph, timeline panels update in real time. | Debugging becomes visual instead of vibe-based. |
 
 ---
 
-## 🛠️ Installation & Usage
+## Quickstart
 
-### Prerequisites
-- Python 3.10+
-- [Ollama](https://ollama.com/) running locally (default model: `qwen2.5:32b`)
+### 1) Install
 
-### Setup
+**Requirements**
+- Python **3.11+**
+- [Ollama](https://ollama.com/) running locally
+
+**Setup**
+
 ```bash
-git clone https://github.com/yourusername/llm-memory.git
-cd llm-memory
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 🖥️ Running the Web UI
-Launch the modern "Claude-like" interface to interact with your memory agent.
+### 2) Run the Web UI (recommended)
 
 ```bash
 python llm_memory/agents_v4/web_ui.py
 ```
-Open **http://127.0.0.1:5000** in your browser.
 
-### 💻 CLI Usage
-```python
-from llm_memory.agents_v4 import MemoryAgent
+Open `http://127.0.0.1:5000`.
 
-# Initialize agent
-agent = MemoryAgent(model_name="qwen2.5:32b")
-
-# Chat with memory
-response = agent.chat("My name is Sid and I moved to NYC 3 years ago.")
-print(response)
-
-# Ask complex questions
-response = agent.chat("How long have I lived in NYC?")
-# Output: "You have lived in NYC for 3 years."
-```
-
----
-
-## 📂 Project Structure
-
-```
-llm_memory/
-├── agents_v4/          # LangGraph Agent Framework
-│   ├── graph.py        # Agent workflow & state machine
-│   ├── tools.py        # Memory tools (save, search, ask)
-│   └── web_ui.py       # Flask-based Web Interface
-├── memory_v4/          # Core Memory System
-│   ├── memory_store.py # Main orchestrator
-│   ├── llm_extractor.py# Fact extraction logic
-│   ├── conflict_resolver.py # Contradiction handling
-│   ├── temporal_state.py # Time & duration engine
-│   └── retrieval.py    # Multi-angle searcher
-├── benchmarks/         # LOCOMO Benchmark Suite
-└── tests/              # Comprehensive Test Suite
-```
-
----
-
-## 🧪 Testing
-
-We maintain 100% test coverage on core components.
+### 3) Run the CLI agent
 
 ```bash
-# Run all V4 tests
-pytest tests/v4/
+python run_agent.py
+```
+
+### 4) Stream LOCOMO conversations into the UI (watch memory form)
+
+1) Start the UI (step 2)
+2) In another terminal:
+
+```bash
+python run_benchmark_ui.py
+```
+
+This will clear memory and replay LOCOMO turns into `/api/chat` so you can watch **Facts/Graph/Timeline** evolve live.
+
+---
+
+## Architecture (Mermaid diagrams)
+
+### End-to-end flow
+
+```mermaid
+flowchart LR
+  U[User / Conversation Turn] --> N[Normalizer]
+  N --> X[Fact Extractor]
+  X --> C[Conflict Resolver]
+  C --> F[(Fact Store (SQLite))]
+  N --> E[(Episodes (raw text))]
+  C --> T[(Temporal State)]
+  C --> G[(Knowledge Graph)]
+
+  Q[Question] --> R[Retriever]
+  R -->|keyword / graph / temporal| F
+  R -->|graph traverse| G
+  R -->|duration + state| T
+  R --> S[Multi-hop Reasoner]
+  S --> A[Answer Synthesis]
+```
+
+### Data model (what gets stored)
+
+```mermaid
+flowchart TB
+  subgraph Stores
+    Facts[(Facts)]
+    Episodes[(Episodes)]
+    Temporal[(Temporal States)]
+    Graph[(Graph Edges)]
+  end
+
+  Facts -->|provenance| Episodes
+  Facts -->|entity links| Graph
+  Facts -->|state changes| Temporal
+```
+
+### Multi-hop reasoning loop (high level)
+
+```mermaid
+flowchart LR
+  Q[Complex question] --> D[Decompose into steps]
+  D --> R1[Retrieve evidence for step 1]
+  R1 --> R2[Retrieve evidence for step 2]
+  R2 --> RC[Self-check evidence sufficiency]
+  RC -->|enough| S[Synthesize answer]
+  RC -->|not enough| D
 ```
 
 ---
 
-## 🔮 Roadmap
+## Benchmarks
 
-- [x] **Stage 1**: Hierarchical Storage
-- [x] **Stage 2**: Memory Decay & Importance
-- [x] **Stage 3**: Conflict Resolution
-- [x] **Stage 4**: Temporal Reasoning & Graph Search
-- [x] **Stage 5**: LangGraph Agent & Web UI
-- [ ] **Stage 6**: Multi-Agent Teams (Supervisor pattern)
-- [ ] **Stage 7**: Cloud Deployment (Docker/Kubernetes)
+This repo includes a benchmark suite under `benchmarks/` with a detailed guide:
+- `benchmarks/README.md`
+
+### Latest benchmark snapshot (from generated report)
+
+The repo contains benchmark reports like:
+- `benchmarks/reports/LLM-Memory (gemma3:27b)_20260121_154816.md`
+
+Key numbers from that report:
+
+| Scenario | Composite | F1 | Contains Match | Exact Match | P95 latency |
+|---|---:|---:|---:|---:|---:|
+| single_hop | 53.9 | 0.195 | 100.0% | 0.0% | 4798.4ms |
+| multi_hop | 39.0 | 0.132 | 100.0% | 0.0% | 8982.2ms |
+| temporal | 21.8 | 0.100 | 90.0% | 0.0% | 6247.1ms |
+| conflict | 20.1 | 0.075 | 66.7% | 0.0% | 7851.6ms |
+
+Overall composite score (same report): **33.7 / 100**.
+
+### Run the benchmark suite
+
+```bash
+python -m benchmarks.benchmark_memory --quick
+```
+
+For the full set of options (scenarios, samples, comparisons), see `benchmarks/README.md`.
 
 ---
 
-## 🤝 Contributing
+## Model configuration
 
-Contributions are welcome! Please read `CONTRIBUTING.md` for details on our code of conduct and the process for submitting pull requests.
+The UI/CLI currently default to `qwen2.5:32b` in:
+- `llm_memory/agents_v4/web_ui.py`
+- `run_agent.py`
 
-## 📄 License
+If you want to switch models, update `model_name="..."` in those files (for example, `openthinker:32b` if you have it in Ollama).
 
-This project is licensed under the MIT License - see the `LICENSE` file for details.
+---
+
+## Repo map
+
+```text
+llm_memory/
+  agents_v4/              # LangGraph agent + Flask UI
+  memory_v4/              # V4 memory system (facts/temporal/retrieval/multi-hop)
+benchmarks/               # Benchmark suite + LOCOMO data + reports
+run_agent.py              # Interactive CLI runner
+run_benchmark_ui.py        # Replays LOCOMO into the Web UI
+```
+
+---
+
+## Testing
+
+```bash
+pytest -q
+```
+
+---
+
+## License
+
+MIT — see `LICENSE`.
