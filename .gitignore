@@ -1,1 +1,33 @@
 dist/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# Virtualenvs
+venv/
+.venv/
+
+# Local databases / runtime artifacts (generated while running agent/UI/benchmarks)
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite-shm
+*.sqlite-wal
+*.sqlite3-shm
+*.sqlite3-wal
+
+# Runtime state directories (local-only)
+agent_memory_v4/
+benchmark_mem_v4/
+benchmark_viz_memory/
+ui_agent_memory/
+flask_agent_memory/

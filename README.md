@@ -8,11 +8,33 @@
 
 ---
 
+## Table of contents
+
+- [Visual tour (UI + architecture)](#visual-tour-ui--architecture)
+- [Why this exists (the problem)](#why-this-exists-the-problem)
+- [What you get](#what-you-get)
+- [Core concepts (how memory is represented)](#core-concepts-how-memory-is-represented)
+- [Quickstart](#quickstart)
+- [Entrypoints & ports (table)](#entrypoints--ports-table)
+- [Architecture (Mermaid diagrams)](#architecture-mermaid-diagrams)
+- [Benchmarks (two layers)](#benchmarks-two-layers)
+- [HTTP API (UI endpoints)](#http-api-ui-endpoints)
+- [Artifacts & where data is stored](#artifacts--where-data-is-stored)
+- [Model configuration](#model-configuration)
+- [Implementation map (where to look in code)](#implementation-map-where-to-look-in-code)
+- [Repo map](#repo-map)
+- [Troubleshooting (common issues)](#troubleshooting-common-issues)
+- [Testing](#testing)
+
+---
+
 ## Visual tour (UI + architecture)
 
 ![Architecture overview](docs/assets/architecture_overview.svg)
 
 ![UI overview](docs/assets/ui_overview.svg)
+
+![Benchmark snapshot](docs/assets/benchmark_snapshot.svg)
 
 > Replace these SVGs with real screenshots later (same paths keep the README stable).
 
@@ -216,6 +238,42 @@ python benchmarks/locomo_v4.py --model qwen2.5:32b --categories 3 --max-conv 5 -
 ```
 
 For the full set of options (scenarios, samples, comparisons), see `benchmarks/README.md`.
+
+---
+
+## HTTP API (UI endpoints)
+
+When you run `llm_memory/agents_v4/web_ui.py` (port 5000):
+
+| Endpoint | Method | Purpose |
+|---|---:|---|
+| `/` | GET | UI HTML |
+| `/api/chat` | POST | Send a user message `{ "message": "..." }` |
+| `/api/memory` | GET | Fetch facts + temporal states + stats |
+| `/api/clear` | POST | Clear memory DB for the UI session |
+
+When you run `benchmark_viz.py` (port 5001):
+
+| Endpoint | Method | Purpose |
+|---|---:|---|
+| `/` | GET | Benchmark dashboard HTML |
+| `/api/state` | GET | Poll latest conversation, facts, temporal, logs |
+| `/api/reset` | POST | Clear benchmark memory |
+| `/api/start_benchmark` | POST | Start feeding LOCOMO into memory |
+
+---
+
+## Artifacts & where data is stored
+
+This project writes local state while you run it:
+
+| Artifact | Default location | What it contains |
+|---|---|---|
+| Agent memory DB | `./agent_memory_v4/` | `*_v4.db` + LangGraph checkpoints |
+| Benchmark memory DBs | `./benchmark_mem_v4/` | per-conversation DBs for LOCOMO |
+| Benchmark visualizer DB | `./benchmark_viz_memory/` | DB used by `benchmark_viz.py` |
+
+Tip: these paths are **intentionally gitignored** (see `.gitignore`).
 
 ---
 

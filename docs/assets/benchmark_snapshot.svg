@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520">
+  <defs>
+    <style>
+      .bg { fill: #0b1220; }
+      .card { fill: #111a2e; stroke: #223255; stroke-width: 2; rx: 18; }
+      .title { fill: #e5e7eb; font: 800 26px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .sub { fill: #a7b0c0; font: 500 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .lbl { fill: #cbd5e1; font: 600 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .num { fill: #e5e7eb; font: 700 14px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .muted { fill: #8b9bb8; font: 500 12px ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial; }
+      .axis { stroke: #223255; stroke-width: 2; }
+      .grid { stroke: #192544; stroke-width: 1; }
+    </style>
+  </defs>
+
+  <rect class="bg" x="0" y="0" width="1200" height="520"/>
+
+  <text class="title" x="40" y="58">Benchmark snapshot (example)</text>
+  <text class="sub" x="40" y="86">From: benchmarks/reports/LLM-Memory (gemma3:27b)_20260121_154816  Composite score by scenario</text>
+
+  <rect class="card" x="40" y="120" width="1120" height="340"/>
+
+  <!-- Plot area -->
+  <line class="axis" x1="110" y1="415" x2="1130" y2="415"/>
+  <line class="axis" x1="110" y1="170" x2="110" y2="415"/>
+
+  <!-- Grid lines (0,25,50,75,100) -->
+  <line class="grid" x1="110" y1="415" x2="1130" y2="415"/>
+  <line class="grid" x1="110" y1="354" x2="1130" y2="354"/>
+  <line class="grid" x1="110" y1="292" x2="1130" y2="292"/>
+  <line class="grid" x1="110" y1="231" x2="1130" y2="231"/>
+  <line class="grid" x1="110" y1="170" x2="1130" y2="170"/>
+
+  <text class="muted" x="78" y="420">0</text>
+  <text class="muted" x="64" y="359">25</text>
+  <text class="muted" x="64" y="297">50</text>
+  <text class="muted" x="64" y="236">75</text>
+  <text class="muted" x="58" y="175">100</text>
+
+  <!-- Bars (Composite scores: single_hop 53.9, multi_hop 39.0, temporal 21.8, conflict 20.1) -->
+  <!-- scaling: 0..100 maps to 245px height -->
+  <!-- single_hop -->
+  <rect x="210" y="283" width="140" height="132" fill="#60a5fa"/>
+  <text class="lbl" x="210" y="445">single_hop</text>
+  <text class="num" x="210" y="273">53.9</text>
+
+  <!-- multi_hop -->
+  <rect x="440" y="320" width="140" height="95" fill="#a78bfa"/>
+  <text class="lbl" x="440" y="445">multi_hop</text>
+  <text class="num" x="440" y="310">39.0</text>
+
+  <!-- temporal -->
+  <rect x="670" y="362" width="140" height="53" fill="#fb923c"/>
+  <text class="lbl" x="670" y="445">temporal</text>
+  <text class="num" x="670" y="352">21.8</text>
+
+  <!-- conflict -->
+  <rect x="900" y="366" width="140" height="49" fill="#34d399"/>
+  <text class="lbl" x="900" y="445">conflict</text>
+  <text class="num" x="900" y="356">20.1</text>
+
+  <text class="muted" x="40" y="492">This is a static SVG for the README. Next step: auto-generate it from the latest report JSON.</text>
+</svg>
