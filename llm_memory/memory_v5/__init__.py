@@ -77,6 +77,7 @@ from .tiered_memory import TieredMemory, SensoryMemory, ShortTermMemory, LongTer
 from .memory_manager import MemoryManager, MemoryOperation
 from .retrieval_v5 import AdvancedRetriever, ChainOfExplorations
 from .reflective import ReflectiveManager
+from .temporal_v5 import TemporalStateTracker, TemporalState, TemporalType
 from .memory_store_v5 import MemoryStoreV5, create_memory_v5
 
 __all__ = [
@@ -106,4 +107,9 @@ __all__ = [
     
     # Reflective
     "ReflectiveManager",
+    
+    # Temporal (ported from V4)
+    "TemporalStateTracker",
+    "TemporalState",
+    "TemporalType",
 ]
