@@ -18,6 +18,7 @@ import re
 from typing import List, Dict, Optional, Tuple, Set, Any
 from dataclasses import dataclass, field
 from collections import defaultdict
+from datetime import datetime, timedelta
 import math
 
 from .graph_store import GraphMemoryStore, Entity, Triplet, EntityType, RelationType
@@ -265,6 +266,94 @@ class AdvancedRetriever:
         # Initialize CoE if graph available
         self.coe = ChainOfExplorations(graph_store) if graph_store else None
     
+    def _resolve_relative_date_in_text(self, text: str, conv_date: str) -> Optional[str]:
+        """
+        Resolve relative date expressions in text to actual dates.
+        
+        Args:
+            text: Content text that may contain "yesterday", "last week", etc.
+            conv_date: The conversation date string to use as reference
+            
+        Returns:
+            Formatted resolved date string, or None if no relative date found
+        """
+        import re
+        from datetime import datetime, timedelta
+        
+        # Parse the conversation date
+        ref_date = self._parse_date_str(conv_date)
+        if not ref_date:
+            return None
+        
+        text_lower = text.lower()
+        resolved = None
+        
+        # Check for relative date patterns
+        if 'yesterday' in text_lower:
+            resolved = ref_date - timedelta(days=1)
+        elif 'day before yesterday' in text_lower:
+            resolved = ref_date - timedelta(days=2)
+        elif 'last week' in text_lower:
+            resolved = ref_date - timedelta(days=7)
+        elif 'two days ago' in text_lower or '2 days ago' in text_lower:
+            resolved = ref_date - timedelta(days=2)
+        elif 'three days ago' in text_lower or '3 days ago' in text_lower:
+            resolved = ref_date - timedelta(days=3)
+        elif 'last friday' in text_lower:
+            days_back = (ref_date.weekday() - 4) % 7
+            if days_back == 0:
+                days_back = 7
+            resolved = ref_date - timedelta(days=days_back)
+        elif 'last monday' in text_lower:
+            days_back = (ref_date.weekday() - 0) % 7
+            if days_back == 0:
+                days_back = 7
+            resolved = ref_date - timedelta(days=days_back)
+        
+        # Match "X days/weeks ago" pattern
+        if not resolved:
+            match = re.search(r'(\d+)\s+(days?|weeks?)\s+ago', text_lower)
+            if match:
+                num = int(match.group(1))
+                unit = match.group(2)
+                if 'day' in unit:
+                    resolved = ref_date - timedelta(days=num)
+                elif 'week' in unit:
+                    resolved = ref_date - timedelta(weeks=num)
+        
+        if resolved:
+            return resolved.strftime("%d %B %Y")
+        return None
+    
+    def _parse_date_str(self, date_str: str) -> Optional[datetime]:
+        """Parse various date string formats."""
+        from datetime import datetime
+        import re
+        
+        if not date_str:
+            return None
+            
+        # Try common formats
+        formats = [
+            "%d %B %Y",        # "8 May 2023"
+            "%d %B, %Y",       # "8 May, 2023"
+            "%B %d, %Y",       # "May 8, 2023"
+            "%Y-%m-%d",        # "2023-05-08"
+            "%d %b %Y",        # "8 May 2023"
+        ]
+        
+        # Strip time component if present
+        date_part = re.sub(r'\d+:\d+\s*(am|pm)?\s*on\s*', '', date_str, flags=re.IGNORECASE)
+        date_part = date_part.strip()
+        
+        for fmt in formats:
+            try:
+                return datetime.strptime(date_part, fmt)
+            except ValueError:
+                continue
+        
+        return None
+    
     def _get_llm(self):
         """Get or create LLM instance."""
         if self._llm is None:
@@ -446,6 +535,7 @@ Answer passage (1-2 sentences):"""
                         "tier": tier,
                         "importance": item.importance,
                         "speaker": item.source_speaker,
+                        "date": item.source_date,  # Critical for temporal extraction
                     },
                 ))
         
@@ -521,11 +611,17 @@ Answer passage (1-2 sentences):"""
             overlap_boost = len(overlap) / (len(query_words) + 1) * 0.3
             result.score += overlap_boost
             
-            # Boost for source diversity
+        # Boost for source diversity
             if result.source_type == "coe_path":
                 result.score += 0.1  # Multi-hop bonus
             if result.source_type == "graph":
                 result.score += 0.05  # Structured data bonus
+            
+            # Temporal Relevance Boosting [NEW]
+            if self._is_temporal_query(query) and self._has_temporal_content(result.content):
+                # Significant boost for temporal content matching temporal query
+                # This prioritizes "I went yesterday" over generic "I like..."
+                result.score += 0.5
         
         # Sort by score
         results.sort(key=lambda x: x.score, reverse=True)
@@ -546,6 +642,39 @@ Answer passage (1-2 sentences):"""
                     break
         
         return selected
+
+    def _is_temporal_query(self, query: str) -> bool:
+        """Check if query is asking for temporal information."""
+        q = query.lower()
+        starts_temporal = q.startswith(('when', 'how long', 'what time', 'what date', 'what year'))
+        has_temporal_words = any(w in q for w in ['duration', 'period', 'since when', 'until when'])
+        return starts_temporal or has_temporal_words
+
+    def _has_temporal_content(self, text: str) -> bool:
+        """Check if text contains temporal indicators."""
+        t = text.lower()
+        
+        # Temporal keywords
+        keywords = [
+            'yesterday', 'today', 'tomorrow',
+            'last week', 'last month', 'last year',
+            'ago', 'since', 'until', 'during',
+            'january', 'february', 'march', 'april', 'may', 'june',
+            'july', 'august', 'september', 'october', 'november', 'december',
+            'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday',
+            'morning', 'afternoon', 'evening', 'night',
+            'year', 'month', 'week', 'day',
+        ]
+        
+        if any(k in t for k in keywords):
+            return True
+            
+        # Date patterns (simple digits check for now as proxy with keywords)
+        import re
+        if re.search(r'\d{4}', t):  # Years
+            return True
+        
+        return False
     
     def build_context(
         self,
@@ -593,7 +722,7 @@ Answer passage (1-2 sentences):"""
                         parts.append(line)
                         total_chars += len(line)
         
-        # Add tiered memories
+        # Add tiered memories - include dates like FACTS for temporal extraction
         if tiered_results:
             parts.append("\nMEMORIES:")
             for r in tiered_results[:10]:
@@ -601,6 +730,16 @@ Answer passage (1-2 sentences):"""
                 speaker = r.metadata.get("speaker")
                 if speaker:
                     line = f"- [{speaker}] {r.content}"
+                
+                # Add date if available - critical for temporal question answering
+                conv_date = r.metadata.get("date")
+                if conv_date:
+                    # Check for relative date expressions and resolve them
+                    resolved_date = self._resolve_relative_date_in_text(r.content, conv_date)
+                    if resolved_date:
+                        line += f" [EVENT: {resolved_date}]"
+                    else:
+                        line += f" [{conv_date}]"
                 
                 if total_chars + len(line) < char_limit:
                     parts.append(line)

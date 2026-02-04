@@ -218,7 +218,7 @@ class SensoryMemory:
         text_lower = text.lower()
         
         # First-person statements
-        if any(p in text_lower for p in ['i am', "i'm", 'my ', 'i have', "i've", 'i like', 'i love']):
+        if any(p in text_lower for p in ['i am', "i'm", 'my ', 'i have', "i've", 'i like', 'i love', 'i went', 'i saw', 'i did']):
             score += 0.2
         
         # Explicit facts/preferences
@@ -226,7 +226,7 @@ class SensoryMemory:
             score += 0.15
         
         # Temporal information
-        if any(p in text_lower for p in ['years', 'months', 'ago', 'since', 'started']):
+        if any(p in text_lower for p in ['years', 'months', 'ago', 'since', 'started', 'yesterday', 'tomorrow', 'last', 'next']):
             score += 0.1
         
         # Named entities (capitalized words)
@@ -615,6 +615,12 @@ class LongTermMemory:
                 continue
             
             content_lower = item.content.lower()
+            
+            # Append speaker to content for search matching
+            # This ensures "Caroline" in query matches messages BY Caroline
+            if item.source_speaker:
+                content_lower += f" {item.source_speaker.lower()}"
+            
             content_words = set(content_lower.split())
             
             # Word overlap score
@@ -852,6 +858,10 @@ class TieredMemory:
                 # Simple relevance scoring
                 query_lower = query.lower()
                 content_lower = item.content.lower()
+                
+                # Append speaker to content for search matching (Consistency with LTM search)
+                if item.source_speaker:
+                    content_lower += f" {item.source_speaker.lower()}"
                 
                 overlap = len(set(query_lower.split()) & set(content_lower.split()))
                 if overlap > 0:

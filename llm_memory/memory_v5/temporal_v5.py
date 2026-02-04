@@ -88,6 +88,36 @@ class TemporalState:
             return duration
         return f"{duration} ago"
     
+    def get_start_date_str(self) -> Optional[str]:
+        """Get formatted start date string."""
+        if self.start_date:
+            return self.start_date.strftime("%d %B %Y")
+        return None
+    
+    def get_multi_format_answer(self, reference_date: datetime = None) -> Dict[str, Any]:
+        """
+        Get answer in multiple formats for flexible matching.
+        
+        Returns dict with:
+        - duration: "4 years"
+        - ago: "4 years ago"
+        - since: "since May 2019"
+        - start_date: "7 May 2019"
+        - source_date: original conversational date
+        """
+        ref = reference_date or datetime.now()
+        result = {
+            "duration": self.calculate_duration_from_reference(ref),
+            "ago": self.calculate_ago(ref),
+            "source_date": self.source_date,
+        }
+        
+        if self.start_date:
+            result["start_date"] = self.start_date.strftime("%d %B %Y")
+            result["since"] = f"since {self.start_date.strftime('%B %Y')}"
+        
+        return result
+    
     def to_dict(self) -> Dict[str, Any]:
         """Convert to dictionary."""
         return {
@@ -212,6 +242,91 @@ class TemporalStateTracker:
         """Generate unique state ID."""
         self._state_counter += 1
         return f"temp_state_{datetime.now().strftime('%Y%m%d%H%M%S')}_{self._state_counter}"
+    
+    def resolve_relative_date(self, text: str, reference_date: datetime) -> Optional[datetime]:
+        """
+        Resolve relative date expressions to actual dates.
+        
+        Converts expressions like:
+        - "yesterday" -> reference_date - 1 day
+        - "last week" -> reference_date - 7 days
+        - "last Friday" -> most recent Friday before reference_date
+        - "two days ago" -> reference_date - 2 days
+        - "3 weeks ago" -> reference_date - 21 days
+        
+        Args:
+            text: Text containing relative date expression
+            reference_date: The conversation/context date to resolve relative to
+            
+        Returns:
+            Resolved datetime or None if no relative date found
+        """
+        text_lower = text.lower()
+        
+        # Yesterday / today / tomorrow
+        if 'yesterday' in text_lower:
+            return reference_date - timedelta(days=1)
+        if 'today' in text_lower:
+            return reference_date
+        if 'tomorrow' in text_lower:
+            return reference_date + timedelta(days=1)
+        
+        # Day before yesterday
+        if 'day before yesterday' in text_lower:
+            return reference_date - timedelta(days=2)
+        
+        # Last week/month/year
+        if 'last week' in text_lower:
+            return reference_date - timedelta(days=7)
+        if 'last month' in text_lower:
+            return reference_date - timedelta(days=30)
+        if 'last year' in text_lower:
+            return reference_date - timedelta(days=365)
+        
+        # "X days/weeks ago" pattern
+        ago_match = re.search(r'(\d+)\s+(days?|weeks?|months?|years?)\s+ago', text_lower)
+        if ago_match:
+            num = int(ago_match.group(1))
+            unit = ago_match.group(2)
+            if 'day' in unit:
+                return reference_date - timedelta(days=num)
+            elif 'week' in unit:
+                return reference_date - timedelta(weeks=num)
+            elif 'month' in unit:
+                return reference_date - timedelta(days=num * 30)
+            elif 'year' in unit:
+                return reference_date - timedelta(days=num * 365)
+        
+        # "two/three/a few days ago"
+        word_nums = {'two': 2, 'three': 3, 'four': 4, 'five': 5, 'six': 6, 'seven': 7,
+                     'a couple': 2, 'a few': 3, 'several': 5}
+        for word, num in word_nums.items():
+            pattern = rf'{word}\s+(days?|weeks?|months?)\s+ago'
+            if re.search(pattern, text_lower):
+                unit_match = re.search(pattern, text_lower)
+                if unit_match:
+                    unit = unit_match.group(1)
+                    if 'day' in unit:
+                        return reference_date - timedelta(days=num)
+                    elif 'week' in unit:
+                        return reference_date - timedelta(weeks=num)
+                    elif 'month' in unit:
+                        return reference_date - timedelta(days=num * 30)
+        
+        # "last Friday", "last Monday", etc.
+        days_of_week = {
+            'monday': 0, 'tuesday': 1, 'wednesday': 2, 'thursday': 3,
+            'friday': 4, 'saturday': 5, 'sunday': 6
+        }
+        for day_name, day_num in days_of_week.items():
+            if f'last {day_name}' in text_lower:
+                # Find the most recent occurrence of this day before reference_date
+                days_back = (reference_date.weekday() - day_num) % 7
+                if days_back == 0:
+                    days_back = 7  # If today is that day, go back a week
+                return reference_date - timedelta(days=days_back)
+        
+        return None
     
     def extract_temporal_states(
         self,
@@ -451,6 +566,39 @@ class TemporalStateTracker:
             return state.calculate_ago(ref)
         else:
             return state.calculate_duration_from_reference(ref)
+    
+    def find_matching_state(
+        self,
+        subject: str,
+        query: str,
+    ) -> Optional[TemporalState]:
+        """
+        Find the most relevant temporal state for a subject and query.
+        
+        Returns the TemporalState object for multi-format answer generation.
+        """
+        subject_lower = subject.lower()
+        query_lower = query.lower()
+        
+        # Find relevant states
+        relevant_states = []
+        for key, state in self.states.items():
+            if subject_lower in key or subject_lower in state.subject.lower():
+                # Check keyword overlap
+                state_text = f"{state.description} {state.state_type} {state.source_text}".lower()
+                query_words = set(re.findall(r'\w+', query_lower)) - {'how', 'long', 'has', 'have', 'been', 'the', 'a', 'an', 'is', 'was', 'does', 'did'}
+                state_words = set(re.findall(r'\w+', state_text))
+                
+                overlap = query_words & state_words
+                if overlap:
+                    relevant_states.append((state, len(overlap)))
+        
+        if not relevant_states:
+            return None
+        
+        # Sort by relevance and return best match
+        relevant_states.sort(key=lambda x: x[1], reverse=True)
+        return relevant_states[0][0]
     
     def get_all_states(self, subject: str = None) -> List[TemporalState]:
         """Get all states, optionally filtered by subject."""

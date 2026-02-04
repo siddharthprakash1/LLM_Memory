@@ -277,7 +277,7 @@ class MemoryStoreV5:
         llm = self._get_llm()
         
         if not llm:
-            return self._extract_fallback(text, speaker)
+            return self._extract_rule_based(text, speaker)
         
         prompt = f"""Extract entities and relationships from this text.
 
@@ -322,10 +322,10 @@ Extract now:"""
         except Exception as e:
             print(f"Extraction error: {e}")
         
-        return self._extract_fallback(text, speaker)
+        return self._extract_rule_based(text, speaker)
     
-    def _extract_fallback(self, text: str, speaker: str) -> Dict[str, Any]:
-        """Enhanced rule-based fallback extraction."""
+    def _extract_rule_based(self, text: str, speaker: str) -> Dict[str, Any]:
+        """Enhanced rule-based extraction (formerly fallback)."""
         import re
         
         entities = []
@@ -338,14 +338,54 @@ Extract now:"""
         # Add speaker as entity
         entities.append({"name": speaker, "type": "person"})
         
+        # Stopwords (Lowercased for matching)
+        stop_names = {'i', 'the', 'a', 'an', 'and', 'but', 'or', 'so', 'if', 'my', 'we', 'they', 'it', 'this', 'that', 
+                      'how', 'what', 'when', 'where', 'why', 'who', 'which', 'to', 'for', 'of', 'in', 'on', 'at', 'by', 
+                      'with', 'from', 'about', 'really', 'very', 'just', 'be', 'is', 'are', 'am', 'was', 'were', 'been'}
+        
         # Extract capitalized names (potential persons/locations)
-        names = re.findall(r'\b([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\b', text)
-        stop_names = {'I', 'The', 'A', 'An', 'And', 'But', 'Or', 'So', 'If', 'My', 'We', 'They', 'It', 'This', 'That'}
+        # Allow acronyms (LGBTQ, US) and mixed case identifiers
+        names = re.findall(r'\b([A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)*)\b', text)
         for name in names:
-            if name not in stop_names and name != speaker:
+            if name.lower() not in stop_names and name != speaker:
                 entities.append({"name": name, "type": "person"})
         
+        def is_valid_entity(text_segment: str) -> bool:
+            """Check if text segment is a valid entity."""
+            if not text_segment:
+                return False
+            
+            ts = text_segment.lower().strip()
+            if not ts:
+                return False
+                
+            # Must contain at least one noun/alphanumeric
+            if not re.search(r'[a-z0-9]', ts):
+                return False
+            
+            # Length constraints
+            words = ts.split()
+            if len(words) > 6: 
+                return False
+            if len(ts) < 2:
+                return False
+                
+            # Stopword checks
+            if ts in stop_names:
+                return False
+            if words[0] in stop_names: # Don't start with stopword
+                return False
+            if words[-1] in stop_names: # Don't end with stopword
+                return False
+                
+            return True
+
         def add_fact(subj, pred, obj, etype="concept"):
+            # Clean object
+            obj = obj.strip(" .,;!?\"'")
+            if not is_valid_entity(obj):
+                return
+                
             key = f"{subj}|{pred}|{obj}".lower()
             if key not in seen_facts:
                 seen_facts.add(key)
@@ -354,59 +394,57 @@ Extract now:"""
                 facts.append({"subject": subj, "predicate": pred, "object": obj})
         
         # 1. PREFERENCES (likes, loves, enjoys, hates)
+        # STRICTER: Capture only specific Noun Phrases, max 5 words
         pref_patterns = [
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:really\s+)?(?:like|love|enjoy|adore)s?\s+(\w+(?:\s+(?:and\s+)?\w+)*)', 'likes'),
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:hate|dislike|can\'t stand)s?\s+(\w+(?:\s+\w+)?)', 'dislikes'),
-            (r'my\s+favorite\s+(?:\w+\s+)?(?:is|are)\s+(\w+(?:\s+\w+)?)', 'likes'),
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:am|\'m)\s+(?:a\s+)?(?:big\s+)?fan\s+of\s+(\w+(?:\s+\w+)?)', 'likes'),
+            (r'\b(?:i|' + speaker.lower() + r')\s+(?:really\s+)?(?:like|love|enjoy|adore)s?\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'),
+            (r'\b(?:i|' + speaker.lower() + r')\s+(?:hate|dislike|can\'t stand)s?\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'dislikes'),
+            (r'my\s+favorite\s+(\w+)\s+(?:is|are)\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'), 
+            (r'\b(?:i|' + speaker.lower() + r')\s+(?:am|\'m)\s+(?:a\s+)?(?:big\s+)?fan\s+of\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'),
         ]
         
         for pattern, relation in pref_patterns:
             for match in re.finditer(pattern, text_lower):
-                obj = match.group(1).strip()
-                # Split by "and" to get multiple preferences
-                parts = re.split(r'\s+and\s+', obj)
+                if match.lastindex == 2:
+                    target = match.group(2).strip()
+                else:
+                    target = match.group(1).strip()
+                    
+                parts = re.split(r'\s+and\s+', target)
                 for part in parts:
-                    part = part.strip()
-                    if part and len(part) > 1 and len(part) < 30:
-                        add_fact(speaker, relation, part, "preference")
-        
-        # 2. LOCATIONS (lives in, moved to/from, originally from)
+                    add_fact(speaker, relation, part, "preference")
+
+        # 2. LOCATIONS (lives in, moved to/from) -> Keep strict [A-Z] patterns
         loc_patterns = [
             (r'\b(?:i\s+)?(?:live|lives|living|reside|residing)\s+in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'lives_in'),
             (r'\b(?:i\s+)?(?:moved|moving|relocated)\s+to\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'moved_to'),
             (r'\b(?:i\s+)?(?:moved|came)\s+from\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'moved_from'),
-            (r'\b(?:originally|originally\s+from)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'from'),
             (r'\bfrom\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:\d+\s+)?(?:years?|months?)\s+ago', 'moved_from'),
-            (r'\bhometown\s+(?:is|was)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'from'),
-            (r'\bborn\s+in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'born_in'),
         ]
         
         for pattern, relation in loc_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, text) 
             if match:
-                loc = match.group(1).strip()
-                if loc and loc not in stop_names:
-                    add_fact(speaker, relation, loc, "location")
+                add_fact(speaker, relation, match.group(1), "location")
         
-        # 3. WORK/CAREER (works at, job is, profession)
+        # 3. WORK/CAREER
         work_patterns = [
             (r'\b(?:i\s+)?(?:work|works|working)\s+(?:at|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'works_at'),
-            (r'\b(?:i\s+)?(?:work|works|working)\s+as\s+(?:a|an)\s+(\w+(?:\s+\w+)?)', 'works_as'),
-            (r'\b(?:i\s+am|i\'m)\s+(?:a|an)\s+(\w+(?:\s+\w+)?)\s+(?:at|for|in)', 'is_a'),
-            (r'\b(?:i\s+am|i\'m)\s+(?:a|an)\s+(\w+)', 'is_a'),
-            (r'\bmy\s+(?:job|career|profession)\s+(?:is|was)\s+(?:a|an)?\s*(\w+(?:\s+\w+)?)', 'works_as'),
-            (r'\b(?:employed|hired)\s+(?:at|by)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'works_at'),
+            # "work as a X" - X must be short (e.g. teacher, engineer)
+            (r'\b(?:i\s+)?(?:work|works|working)\s+as\s+(?:a|an)\s+([a-zA-Z\s]{3,20})', 'works_as'),
+            (r'\b(?:i\s+am|i\'m)\s+(?:a|an)\s+([a-zA-Z\s]{3,20})\s+(?:at|for|in)', 'is_a'), 
+            # "My job is..."
+            (r'\bmy\s+(?:job|career|profession)\s+(?:is|was)\s+(?:a|an)?\s*([a-zA-Z\s]{3,20})', 'works_as'),
         ]
         
         for pattern, relation in work_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, text) 
+            if not match:
+                match = re.search(pattern, text, re.IGNORECASE)
+            
             if match:
-                obj = match.group(1).strip()
-                if obj and len(obj) > 1:
-                    etype = "organization" if relation == "works_at" else "concept"
-                    add_fact(speaker, relation, obj, etype)
-        
+                etype = "organization" if relation == "works_at" else "concept"
+                add_fact(speaker, relation, match.group(1), etype)
+
         # 4. RELATIONSHIPS (friend, family, married)
         rel_patterns = [
             (r'\bmy\s+(?:friend|buddy|pal)\s+([A-Z][a-z]+)', 'friend_of'),
@@ -415,66 +453,56 @@ Extract now:"""
             (r'\bmarried\s+to\s+([A-Z][a-z]+)', 'married_to'),
             (r'\bmy\s+(?:wife|husband|spouse)\s+(?:is\s+)?([A-Z][a-z]+)?', 'married_to'),
             (r'\bmy\s+(sister|brother|mother|father|mom|dad|son|daughter)\s+(?:is\s+)?([A-Z][a-z]+)?', 'family'),
-            (r'\b([A-Z][a-z]+)\s+(?:also\s+)?works?\s+(?:at|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'works_at'),
         ]
         
         for pattern, relation in rel_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, text) 
             if match:
-                if match.lastindex >= 2 and relation == 'works_at':
-                    # Person works at place
-                    person = match.group(1)
-                    place = match.group(2)
-                    if person and place:
-                        entities.append({"name": person, "type": "person"})
-                        add_fact(person, relation, place, "organization")
-                elif match.lastindex >= 1:
-                    obj = match.group(1).strip() if match.group(1) else ""
-                    if obj and obj not in stop_names:
-                        add_fact(speaker, relation, obj, "person")
+                obj = match.group(1).strip() if match.group(1) else ""
+                add_fact(speaker, relation, obj, "person")
         
         # 5. ATTRIBUTES (is vegetarian, is allergic, has)
         attr_patterns = [
             (r'\b(?:i\s+am|i\'m)\s+(vegetarian|vegan|single|married|divorced)', 'is'),
-            (r'\b(?:i\s+am|i\'m)\s+allergic\s+to\s+(\w+(?:\s+\w+)?)', 'allergic_to'),
-            (r'\b(?:i\s+have|i\'ve\s+got)\s+(?:a|an)?\s*(\w+(?:\s+\w+)?)\s+allergy', 'allergic_to'),
+            (r'\b(?:i\s+am|i\'m)\s+allergic\s+to\s+([a-zA-Z\s]{3,20})', 'allergic_to'),
+            (r'\b(?:i\s+have|i\'ve\s+got)\s+(?:a|an)?\s*([a-zA-Z\s]{3,20})\s+allergy', 'allergic_to'),
             (r'\b(?:i\s+am|i\'m)\s+(\d+)\s+years?\s+old', 'age_is'),
-            (r'\bmy\s+name\s+is\s+([A-Z][a-z]+)', 'name_is'),
         ]
         
         for pattern, relation in attr_patterns:
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                obj = match.group(1).strip()
-                if obj:
-                    add_fact(speaker, relation, obj, "attribute")
+                add_fact(speaker, relation, match.group(1), "attribute")
         
         # 6. EVENTS (went to, attended, visited)
+        # Use simple capture with validation
         event_patterns = [
-            (r'\b(?:i\s+)?(?:went|traveled|visited)\s+(?:to\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'visited'),
-            (r'\b(?:i\s+)?(?:attended|joined|participated\s+in)\s+(?:a|an|the)?\s*(.+?)(?:\s+last|\s+yesterday|\.|,|$)', 'attended'),
-            (r'\b(?:i\s+)?(?:met|saw)\s+([A-Z][a-z]+)', 'met'),
+            (r'\b(?:i\s+)?(?:went|traveled|visited)\s+(?:to\s+)?((?:[a-zA-Z0-9\-]+\s?){1,5})', 'visited'),
+            (r'\b(?:i\s+)?(?:attended|joined|participated\s+in)\s+(?:a|an|the)?\s*((?:[a-zA-Z0-9\-]+\s?){1,6})', 'attended'),
         ]
         
         for pattern, relation in event_patterns:
+            # Case insensitive match
             match = re.search(pattern, text, re.IGNORECASE)
             if match:
-                obj = match.group(1).strip()[:50]
-                if obj and len(obj) > 1:
+                obj = match.group(1).strip()
+                # Manual filter for common verbs mis-captured
+                if obj.lower() in ['sleep', 'bed', 'work', 'home', 'school']:
+                     pass # Maybe allow school/work/home?
+                else:
                     add_fact(speaker, relation, obj, "event")
         
-        # 7. TEMPORAL FACTS (duration mentions)
+        # 7. TEMPORAL FACTS
         duration_patterns = [
-            (r'\bfor\s+(\d+)\s+(years?|months?)', 'duration'),
-            (r'(\d+)\s+(years?|months?)\s+ago', 'ago'),
+            (r'\bfor\s+(\d+\s+(?:years?|months?|weeks?|days?))', 'duration'),
+            (r'(\d+\s+(?:years?|months?|weeks?|days?))\s+ago', 'ago'),
             (r'\bsince\s+(\d{4})', 'since'),
         ]
         
         for pattern, relation in duration_patterns:
             match = re.search(pattern, text_lower)
             if match:
-                duration_text = match.group(0)
-                add_fact(speaker, f"has_{relation}", duration_text, "temporal")
+                add_fact(speaker, f"has_{relation}", match.group(1), "temporal")
         
         return {
             "entities": entities,
@@ -604,10 +632,15 @@ Extract now:"""
         
         # Add relations/triplets
         for rel in extracted.get("relations", []):
-            source_name = rel["source"]
-            target_name = rel["target"]
+            source_name = rel.get("source")
+            target_name = rel.get("target")
+            
+            # Skip if source or target is None/empty
+            if not source_name or not target_name:
+                continue
+            
             rel_type = relation_map.get(
-                rel["relation"].lower().replace(" ", "_"),
+                rel.get("relation", "").lower().replace(" ", "_"),
                 RelationType.RELATED_TO
             )
             
@@ -616,9 +649,12 @@ Extract now:"""
             target_type = EntityType.UNKNOWN
             
             for ent in extracted.get("entities", []):
-                if ent["name"].lower() == source_name.lower():
+                ent_name = ent.get("name")
+                if not ent_name:
+                    continue
+                if ent_name.lower() == source_name.lower():
                     source_type = type_map.get(ent.get("type"), EntityType.UNKNOWN)
-                if ent["name"].lower() == target_name.lower():
+                if ent_name.lower() == target_name.lower():
                     target_type = type_map.get(ent.get("type"), EntityType.UNKNOWN)
             
             self.graph.add_triplet(
@@ -651,11 +687,11 @@ Extract now:"""
         """
         parts = []
         
-        # Check for temporal/duration questions first
+        # Check for temporal/duration questions first - embed rich temporal info
         if self._is_temporal_question(question):
-            temporal_answer = self.answer_duration_question(question)
-            if temporal_answer:
-                parts.append(f"TEMPORAL INFO: {temporal_answer}")
+            temporal_info = self._get_rich_temporal_info(question)
+            if temporal_info:
+                parts.append(temporal_info)
         
         # Use advanced retriever
         results = self.retriever.retrieve(
@@ -678,6 +714,74 @@ Extract now:"""
             return "\n".join(parts) + "\n\n" + context
         return context
     
+    def _get_rich_temporal_info(self, question: str) -> Optional[str]:
+        """
+        Get temporal info in multiple formats for better answer matching.
+        
+        Returns formatted string with duration, date, and since info.
+        """
+        import re
+        
+        # Extract subject from question
+        subject = None
+        stop_words = {'How', 'What', 'When', 'Where', 'Who', 'Why', 'Does', 'Did', 'Is', 'Has', 'Have'}
+        matches = re.finditer(r'\b([A-Z][a-z]+)\b', question)
+        for match in matches:
+            word = match.group(1)
+            if word not in stop_words:
+                subject = word
+                break
+        
+        if not subject:
+            if any(p in question.lower() for p in ['i ', 'my ', 'me ']):
+                subject = "User"
+            else:
+                return None
+        
+        # Get reference date from latest turn
+        reference_date = None
+        if self.turns:
+            latest_turn = max(self.turns.values(), key=lambda t: t.timestamp)
+            ref_date_str = latest_turn.date
+            if ref_date_str:
+                reference_date = self.temporal_tracker._parse_date(ref_date_str)
+        
+        # Find relevant temporal state
+        state = self.temporal_tracker.find_matching_state(subject, question)
+        if not state:
+            return None
+        
+        # Get multi-format answer
+        formats = state.get_multi_format_answer(reference_date)
+        
+        # Build rich temporal info string - ONLY with valid (non-unknown) values
+        info_parts = ["TEMPORAL INFO:"]
+        
+        # Duration format: "4 years" - skip if "unknown"
+        duration = formats.get("duration", "")
+        if duration and "unknown" not in duration.lower():
+            info_parts.append(f"- Duration: {duration}")
+        
+        # Ago format: "4 years ago" - skip if "unknown"
+        ago = formats.get("ago", "")
+        if ago and "unknown" not in ago.lower():
+            info_parts.append(f"- Time ago: {ago}")
+        
+        # Since format: "since May 2019"
+        if formats.get("since"):
+            info_parts.append(f"- Period: {formats['since']}")
+        
+        # Date format: "7 May 2019"
+        if formats.get("start_date"):
+            info_parts.append(f"- Start date: {formats['start_date']}")
+        
+        # Source date (conversation date) - this is key for "When" questions
+        if formats.get("source_date"):
+            info_parts.append(f"- Mentioned on: {formats['source_date']}")
+        
+        # Only return if we have meaningful temporal info (more than just the header)
+        return "\n".join(info_parts) if len(info_parts) > 1 else None
+    
     def _is_temporal_question(self, question: str) -> bool:
         """Check if question is about time/duration."""
         temporal_keywords = [
@@ -699,8 +803,15 @@ Extract now:"""
         Handles questions like:
         - "How long has Caroline had her friends?"
         - "How long ago did X happen?"
+        
+        Uses the conversation context date for accurate temporal calculation.
         """
         import re
+        
+        # GUARD: "When" questions ask for a date, not a duration.
+        # Defer to retrieval context which handles [EVENT: date] extraction.
+        if question.lower().startswith('when'):
+            return None
         
         # Extract subject from question if not provided
         if not subject:
@@ -720,7 +831,15 @@ Extract now:"""
             else:
                 return None
         
-        return self.temporal_tracker.answer_duration_question(subject, question)
+        # Get reference date from the latest conversation turn (NOT datetime.now())
+        reference_date = None
+        if self.turns:
+            latest_turn = max(self.turns.values(), key=lambda t: t.timestamp)
+            ref_date_str = latest_turn.date
+            if ref_date_str:
+                reference_date = self.temporal_tracker._parse_date(ref_date_str)
+        
+        return self.temporal_tracker.answer_duration_question(subject, question, reference_date)
     
     def query_graph(
         self,
