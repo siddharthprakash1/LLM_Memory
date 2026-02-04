@@ -1,38 +1,19 @@
 dist/
-
-# Python
-__pycache__/
-*.py[cod]
-*.pyd
-*.so
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-coverage.xml
-htmlcov/
-
-# Virtualenvs
 venv/
-.venv/
-
-# Local databases / runtime artifacts (generated while running agent/UI/benchmarks)
-*.db
-*.sqlite
-*.sqlite3
-*.sqlite-shm
-*.sqlite-wal
-*.sqlite3-shm
-*.sqlite3-wal
-
-# Runtime state directories (local-only)
-agent_memory_v4/
-benchmark_mem_v4/
+__pycache__/
+*.pyc
+.DS_Store
+benchmark_compare_*/
+benchmark_mem_*/
+benchmark_v5_*/
 benchmark_viz_memory/
-ui_agent_memory/
+agent_memory_v*/
 flask_agent_memory/
 longmemeval_memory/
-
-# Large dataset files (download separately)
-benchmarks/datasets/longmemeval/*.json
-benchmarks/datasets/longmemeval/*.jsonl
+memory_v5/
+quick_bench_*/
+test_v*/
+ui_agent_memory/
+benchmark_*.json
+benchmark_run.log
+benchmarks/datasets/
