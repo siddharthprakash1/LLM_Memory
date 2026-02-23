@@ -334,7 +334,7 @@ class ShortTermMemory:
     
     def __init__(
         self,
-        capacity: int = 20,  # Extended Miller's law for AI
+        capacity: int = 200,  # Extended for AI agent workloads
         decay_rate: float = 0.1,  # Activation decay per hour
     ):
         self.capacity = capacity
@@ -424,17 +424,16 @@ class ShortTermMemory:
         Get items ready for promotion to long-term memory.
         
         Criteria:
-        - High importance
-        - Multiple rehearsals
-        - Sufficient age
+        - Moderate-to-high importance (>= 0.4)
+        - OR multiple rehearsals regardless of importance
         """
         promotable = []
         for item in self.items.values():
-            # High importance + rehearsed
-            if item.importance >= 0.6 and item.rehearsal_count >= 2:
+            # Moderate importance is enough — don't gate on rehearsal
+            if item.importance >= 0.4:
                 promotable.append(item)
-            # Very high importance
-            elif item.importance >= 0.8:
+            # Rehearsed items always promote
+            elif item.rehearsal_count >= 1:
                 promotable.append(item)
         
         return promotable
