@@ -17,6 +17,7 @@ Key Improvements over V4:
 """
 
 import json
+import logging
 import sqlite3
 from typing import List, Dict, Optional, Tuple, Any
 from dataclasses import dataclass, field
@@ -38,6 +39,9 @@ from .memory_manager import (
 from .retrieval_v5 import AdvancedRetriever, ChainOfExplorations
 from .reflective import ReflectiveManager
 from .temporal_v5 import TemporalStateTracker, TemporalState
+from .embedder import get_embedder, MemoryEmbedder
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -53,6 +57,19 @@ class ConversationTurn:
     # Extracted data
     extracted_facts: List[Dict] = field(default_factory=list)
     extracted_entities: List[str] = field(default_factory=list)
+
+
+@dataclass
+class Episode:
+    """A raw conversation exchange stored for fallback retrieval."""
+    episode_id: str
+    session_id: str
+    speaker: str
+    content: str
+    date: str
+    timestamp: str = field(default_factory=lambda: datetime.now().isoformat())
+    turn_index: int = 0
+    embedding: Optional[List[float]] = None
 
 
 class MemoryStoreV5:
@@ -92,6 +109,7 @@ class MemoryStoreV5:
         persist_path: str = "./memory_v5",
         model_name: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
+        openai_api_key: Optional[str] = None,
         use_llm: bool = True,
     ):
         self.user_id = user_id
@@ -100,6 +118,7 @@ class MemoryStoreV5:
         
         self.model_name = model_name
         self.ollama_url = ollama_url
+        self.openai_api_key = openai_api_key
         self.use_llm = use_llm
         
         # Initialize all components
@@ -110,8 +129,19 @@ class MemoryStoreV5:
         self.turns: Dict[str, ConversationTurn] = {}
         self._turn_counter = 0
         
+        # Episode storage (raw conversation fallback)
+        self.episodes: Dict[str, Episode] = {}
+        self._episode_counter = 0
+        
+        # Embedder for episode embeddings
+        self.embedder = get_embedder()
+        
         # LLM for extraction
         self._llm = None
+        
+        # Init episode DB + load existing episodes
+        self._init_episode_db()
+        self._load_episodes()
     
     def _init_components(self):
         """Initialize all V5 components."""
@@ -132,37 +162,192 @@ class MemoryStoreV5:
             use_llm=self.use_llm,
             llm_model=self.model_name,
             ollama_url=self.ollama_url,
+            openai_api_key=self.openai_api_key,
         )
         
         # 4. Advanced Retriever
         self.retriever = AdvancedRetriever(
             graph_store=self.graph,
             tiered_memory=self.tiered,
+            memory_store=self,  # Pass self for episode access
             llm_model=self.model_name,
             ollama_url=self.ollama_url,
+            openai_api_key=self.openai_api_key,
         )
         
         # 5. Reflective Manager
         self.reflective = ReflectiveManager(
             llm_model=self.model_name,
             ollama_url=self.ollama_url,
+            openai_api_key=self.openai_api_key,
         )
         
         # 6. Temporal State Tracker (ported from V4)
         self.temporal_tracker = TemporalStateTracker()
     
+    def _init_episode_db(self):
+        """Initialize SQLite table for episode storage."""
+        db_path = str(self.persist_path / f"{self.user_id}_episodes.db")
+        self._episode_db_path = db_path
+        conn = sqlite3.connect(db_path)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS episodes (
+                episode_id TEXT PRIMARY KEY,
+                session_id TEXT,
+                speaker TEXT,
+                content TEXT NOT NULL,
+                date TEXT,
+                timestamp TEXT,
+                turn_index INTEGER,
+                embedding BLOB
+            )
+        """)
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_ep_session ON episodes(session_id)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_ep_speaker ON episodes(speaker)")
+        conn.execute("CREATE INDEX IF NOT EXISTS idx_ep_date ON episodes(date)")
+        conn.commit()
+        conn.close()
+    
+    def _load_episodes(self):
+        """Load episodes from database into memory."""
+        try:
+            conn = sqlite3.connect(self._episode_db_path)
+            conn.row_factory = sqlite3.Row
+            cursor = conn.execute("SELECT * FROM episodes")
+            for row in cursor:
+                data = dict(row)
+                embedding = json.loads(data['embedding']) if data.get('embedding') else None
+                ep = Episode(
+                    episode_id=data['episode_id'],
+                    session_id=data['session_id'],
+                    speaker=data['speaker'],
+                    content=data['content'],
+                    date=data['date'],
+                    timestamp=data['timestamp'],
+                    turn_index=data['turn_index'] or 0,
+                    embedding=embedding,
+                )
+                self.episodes[ep.episode_id] = ep
+            conn.close()
+            logger.info(f"Loaded {len(self.episodes)} episodes")
+        except Exception as e:
+            logger.warning(f"Error loading episodes: {e}")
+    
+    def _save_episode(self, episode: Episode):
+        """Persist a single episode to database."""
+        conn = sqlite3.connect(self._episode_db_path)
+        conn.execute("""
+            INSERT OR REPLACE INTO episodes
+            (episode_id, session_id, speaker, content, date, timestamp, turn_index, embedding)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        """, (
+            episode.episode_id,
+            episode.session_id,
+            episode.speaker,
+            episode.content,
+            episode.date,
+            episode.timestamp,
+            episode.turn_index,
+            json.dumps(episode.embedding) if episode.embedding else None,
+        ))
+        conn.commit()
+        conn.close()
+    
+    def _add_episode(self, speaker: str, text: str, date: str, session_id: str):
+        """Store a raw conversation turn as an episode."""
+        self._episode_counter += 1
+        ep = Episode(
+            episode_id=f"ep_{datetime.now().strftime('%Y%m%d%H%M%S')}_{self._episode_counter}",
+            session_id=session_id,
+            speaker=speaker,
+            content=text,
+            date=date,
+            turn_index=self._episode_counter,
+        )
+        # Compute embedding for episode search
+        try:
+            vec = self.embedder.encode_single(text)
+            ep.embedding = vec.tolist()
+        except Exception as e:
+            logger.warning(f"Episode embedding failed: {e}")
+        
+        self.episodes[ep.episode_id] = ep
+        self._save_episode(ep)
+    
+    def search_episodes(
+        self,
+        query: str,
+        top_k: int = 10,
+    ) -> List[Tuple[Episode, float]]:
+        """Search episodes using keyword + semantic matching."""
+        results = []
+        query_lower = query.lower()
+        query_words = set(query_lower.split())
+        
+        # Keyword search
+        for ep in self.episodes.values():
+            content_lower = ep.content.lower()
+            content_words = set(content_lower.split())
+            overlap = query_words & content_words
+            if overlap:
+                score = len(overlap) / (len(query_words) + 1)
+                if ep.speaker and ep.speaker.lower() in query_lower:
+                    score += 0.2
+                results.append((ep, score))
+        
+        # Semantic search (if embeddings exist)
+        episodes_with_emb = [
+            (ep, ep.embedding) for ep in self.episodes.values() if ep.embedding
+        ]
+        if episodes_with_emb:
+            try:
+                import numpy as np
+                query_vec = self.embedder.encode_single(query)
+                corpus = np.array([emb for _, emb in episodes_with_emb])
+                scores = self.embedder.similarity(query_vec, corpus)
+                
+                for i, (ep, _) in enumerate(episodes_with_emb):
+                    sem_score = float(scores[i])
+                    if sem_score > 0.3:
+                        # Check if already in results
+                        existing = next(
+                            (r for r in results if r[0].episode_id == ep.episode_id),
+                            None
+                        )
+                        if existing:
+                            # Boost existing score
+                            idx = results.index(existing)
+                            results[idx] = (ep, max(existing[1], sem_score))
+                        else:
+                            results.append((ep, sem_score))
+            except Exception as e:
+                logger.warning(f"Semantic episode search failed: {e}")
+        
+        results.sort(key=lambda x: x[1], reverse=True)
+        return results[:top_k]
+    
     def _get_llm(self):
         """Get or create LLM instance."""
         if self._llm is None and self.use_llm:
             try:
-                from langchain_ollama import ChatOllama
-                self._llm = ChatOllama(
-                    model=self.model_name,
-                    temperature=0.1,
-                    base_url=self.ollama_url,
-                )
+                if self.openai_api_key or "gpt" in self.model_name.lower():
+                    from langchain_openai import ChatOpenAI
+                    self._llm = ChatOpenAI(
+                        model=self.model_name,
+                        temperature=0.1,
+                        api_key=self.openai_api_key,
+                        request_timeout=60.0,
+                        max_retries=3,
+                    )
+                else:
+                    from langchain_ollama import ChatOllama
+                    self._llm = ChatOllama(
+                        model=self.model_name,
+                        temperature=0.1,
+                        base_url=self.ollama_url,
+                    )
             except Exception as e:
-                print(f"LLM init error: {e}")
+                logger.error(f"LLM init error: {e}")
         return self._llm
     
     def _generate_turn_id(self) -> str:
@@ -184,6 +369,7 @@ class MemoryStoreV5:
         text: str,
         date: str = None,
         session_id: str = None,
+        extraction_result: Optional[Dict[str, Any]] = None,
     ) -> ConversationTurn:
         """
         Add a conversation turn with full V5 processing pipeline.
@@ -191,7 +377,7 @@ class MemoryStoreV5:
         Pipeline:
         1. Create/track session
         2. Process through tiered memory (filtering + classification)
-        3. Extract entities and relations for graph
+        3. Extract entities and relations for graph (or use provided)
         4. Use Memory Manager for ADD/UPDATE/DELETE decisions
         5. Store in both graph and tiered stores
         6. Update reflective manager
@@ -201,6 +387,7 @@ class MemoryStoreV5:
             text: What they said  
             date: When (defaults to now)
             session_id: Session identifier
+            extraction_result: (Optional) Pre-calculated extraction to skip LLM step
             
         Returns:
             ConversationTurn with extraction results
@@ -224,6 +411,9 @@ class MemoryStoreV5:
             session_id=session_id,
         )
         
+        # STAGE 0: Store raw episode for fallback retrieval
+        self._add_episode(speaker, text, date, session_id)
+        
         # STAGE 1: Tiered Memory Processing
         tiered_item = self.tiered.process_input(
             text=text,
@@ -233,7 +423,12 @@ class MemoryStoreV5:
         )
         
         # STAGE 2: Extract Entities and Relations
-        extracted = self._extract_entities_and_relations(text, speaker, date)
+        if extraction_result:
+             # Use pre-calculated result (e.g. from parallel batch processing)
+             extracted = extraction_result
+        else:
+             extracted = self._extract_entities_and_relations(text, speaker, date)
+             
         turn.extracted_facts = extracted.get("facts", [])
         turn.extracted_entities = extracted.get("entities", [])
         
@@ -243,8 +438,8 @@ class MemoryStoreV5:
         # STAGE 4: Add to Graph
         self._add_to_graph(extracted, speaker, date, session_id)
         
-        # STAGE 5: Update Reflective Manager
-        self.reflective.prospective.add_utterance(speaker, text, session_id)
+        # STAGE 5: (Reflective Manager disabled — no-op overhead removed)
+        # self.reflective.prospective.add_utterance(speaker, text, session_id)
         
         # STAGE 6: Extract Temporal States (ported from V4)
         temporal_states = self.temporal_tracker.extract_temporal_states(
@@ -279,103 +474,122 @@ class MemoryStoreV5:
         if not llm:
             return self._extract_rule_based(text, speaker)
         
-        prompt = f"""Extract entities and relationships from this text.
+        prompt = f"""You are a fact extraction system. Extract structured facts from the conversation turn.
 
-Speaker: {speaker}
-Date: {date}
-Text: {text}
+SPEAKER: {speaker}
+MESSAGE: {text}
+DATE: {date}
 
-Return JSON with:
-1. entities: list of {{"name": string, "type": "person|location|organization|event|object|concept|preference"}}
+Extract ALL facts mentioned. For each fact, provide:
+- type: preference|attribute|relationship|event|state_change|plan|opinion|temporal
+- subject: who/what the fact is about (use speaker name if about them)
+- predicate: the relationship/action verb
+- object: what the fact states
+- temporal_scope: ongoing|past|future|point_in_time
+- duration: if mentioned (e.g., "4 years", "since 2020")
+- confidence: 0.0-1.0 based on how explicit the fact is
+
+IMPORTANT RULES:
+1. Extract EVERY meaningful fact, even small ones.
+2. Extract relationships between entities mentioned, not just about the speaker.
+   - Example: "I work at Couchbase, which is a database company."
+     -> Fact 1: Subject="{speaker}", Predicate="works at", Object="Couchbase"
+     -> Fact 2: Subject="Couchbase", Predicate="is a", Object="database company"
+3. Be granular. Break complex sentences into multiple facts.
+4. For "I like X", subject="{speaker}", predicate="likes", object="X"
+5. For "I moved from X", type="state_change", extract the origin
+6. For "4 years ago", calculate and note the duration
+7. Resolve "I/my/me" to "{speaker}"
+8. Don't include timestamps in the object
+
+Return a JSON object with:
+1. entities: list of {{"name": string, "type": "person|location|organization|event|object|concept|preference|time|attribute"}}
 2. relations: list of {{"source": string, "relation": string, "target": string}}
-3. facts: list of {{"subject": string, "predicate": string, "object": string}}
-
-For "I/me/my", use "{speaker}" as the entity name.
-
-Example output:
-{{
-  "entities": [
-    {{"name": "Alice", "type": "person"}},
-    {{"name": "hiking", "type": "preference"}}
-  ],
-  "relations": [
-    {{"source": "Alice", "relation": "likes", "target": "hiking"}}
-  ],
-  "facts": [
-    {{"subject": "Alice", "predicate": "likes", "object": "hiking"}}
-  ]
-}}
+3. facts: list of {{"subject": string, "predicate": string, "object": string, "type": string, "temporal_scope": string, "duration": string or null, "confidence": number}}
 
 Extract now:"""
         
         try:
             from langchain_core.messages import HumanMessage
-            import re
             
             response = llm.invoke([HumanMessage(content=prompt)])
             
-            # Parse JSON from response
-            match = re.search(r'\{[\s\S]*\}', response.content)
+            return self._parse_extraction_response(response.content)
+        except Exception as e:
+            logger.warning(f"Extraction failed: {e}")
+            return {"entities": [], "relations": [], "facts": []}
+    
+    def _parse_extraction_response(self, response_content: str) -> Dict[str, Any]:
+        """Parses the LLM response content to extract JSON."""
+        import re
+        try:
+            match = re.search(r'\{[\s\S]*\}', response_content)
             if match:
                 data = json.loads(match.group(0))
                 return data
-        except Exception as e:
-            print(f"Extraction error: {e}")
-        
-        return self._extract_rule_based(text, speaker)
+        except json.JSONDecodeError as e:
+            logger.warning(f"JSON parsing error: {e}")
+        return {"entities": [], "relations": [], "facts": []}
     
     def _extract_rule_based(self, text: str, speaker: str) -> Dict[str, Any]:
-        """Enhanced rule-based extraction (formerly fallback)."""
+        """Enhanced rule-based extraction with STRICT filtering."""
         import re
         
         entities = []
         relations = []
         facts = []
-        seen_facts = set()  # Avoid duplicates
+        seen_facts = set()
         
         text_lower = text.lower()
         
-        # Add speaker as entity
+        # Add speaker
         entities.append({"name": speaker, "type": "person"})
         
-        # Stopwords (Lowercased for matching)
-        stop_names = {'i', 'the', 'a', 'an', 'and', 'but', 'or', 'so', 'if', 'my', 'we', 'they', 'it', 'this', 'that', 
-                      'how', 'what', 'when', 'where', 'why', 'who', 'which', 'to', 'for', 'of', 'in', 'on', 'at', 'by', 
-                      'with', 'from', 'about', 'really', 'very', 'just', 'be', 'is', 'are', 'am', 'was', 'were', 'been'}
-        
-        # Extract capitalized names (potential persons/locations)
-        # Allow acronyms (LGBTQ, US) and mixed case identifiers
-        names = re.findall(r'\b([A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)*)\b', text)
-        for name in names:
-            if name.lower() not in stop_names and name != speaker:
-                entities.append({"name": name, "type": "person"})
+        # Expanded Stopwords
+        stop_names = {
+            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+            'he', 'him', 'his', 'himself', 'she', 'her', 'hers', 'herself', 'it', 'its', 'itself',
+            'they', 'them', 'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this',
+            'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+            'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 'a', 'an', 'the',
+            'and', 'but', 'if', 'or', 'because', 'as', 'until', 'while', 'of', 'at', 'by',
+            'for', 'with', 'about', 'against', 'between', 'into', 'through', 'during', 'before',
+            'after', 'above', 'below', 'to', 'from', 'up', 'down', 'in', 'out', 'on', 'off',
+            'over', 'under', 'again', 'further', 'then', 'once', 'here', 'there', 'when',
+            'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more', 'most',
+            'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+            'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now',
+            'really', 'actually', 'literally', 'basically', 'probably', 'maybe', 'might',
+            'go', 'going', 'went', 'gone', 'get', 'getting', 'got', 'make', 'making', 'made',
+            'talk', 'talking', 'talked', 'say', 'saying', 'said', 'tell', 'telling', 'told',
+            'today', 'yesterday', 'tomorrow', 'tonight', 'morning', 'afternoon', 'evening', 'night'
+        }
         
         def is_valid_entity(text_segment: str) -> bool:
-            """Check if text segment is a valid entity."""
-            if not text_segment:
-                return False
+            """Stricter validation for entities."""
+            if not text_segment: return False
+            ts = text_segment.strip()
+            ts_lower = ts.lower()
+            if not ts: return False
             
-            ts = text_segment.lower().strip()
-            if not ts:
-                return False
-                
-            # Must contain at least one noun/alphanumeric
-            if not re.search(r'[a-z0-9]', ts):
-                return False
-            
-            # Length constraints
+            # 1. Length Check (Max 4 words is safer for rule-based)
             words = ts.split()
-            if len(words) > 6: 
-                return False
-            if len(ts) < 2:
-                return False
-                
-            # Stopword checks
-            if ts in stop_names:
-                return False
-            if words[0] in stop_names: # Don't start with stopword
-                return False
-            if words[-1] in stop_names: # Don't end with stopword
+            if len(words) > 4: return False
+            if len(ts) < 2: return False
+            
+            # 2. Character Check (Must have letters)
+            if not re.search(r'[a-zA-Z]', ts): return False
+            # Reject if typical garbage chars
+            if re.search(r'[(){}\[\]<>]', ts): return False
+            
+            # 3. Stopword Check (Start/End)
+            if words[0].lower() in stop_names: return False
+            if words[-1].lower() in stop_names: return False
+            if ts_lower in stop_names: return False
+            
+            # 4. Phrase specific garbage check
+            # partial phrases often end with prepositions or conjunctions
+            if ts_lower.endswith((' with', ' to', ' from', ' in', ' on', ' at', ' by', ' for', ' about')):
                 return False
                 
             return True
@@ -385,125 +599,102 @@ Extract now:"""
             obj = obj.strip(" .,;!?\"'")
             if not is_valid_entity(obj):
                 return
+            
+            # Clean subject
+            if not is_valid_entity(subj):
+                return
                 
             key = f"{subj}|{pred}|{obj}".lower()
             if key not in seen_facts:
                 seen_facts.add(key)
+                # Capitalize if needed (for display)
+                if obj.islower() and len(obj) > 3:
+                     obj = obj.title()
+                
                 entities.append({"name": obj, "type": etype})
                 relations.append({"source": subj, "relation": pred, "target": obj})
                 facts.append({"subject": subj, "predicate": pred, "object": obj})
+
+        # 1. PREFERENCES
+        # Capture strictly: (love/like/hate) + (Determiner?) + (Adjective?) + (Noun Pipeline)
+        # Avoid capturing clauses
+        noun_phrase = r'(?:(?:a|an|the|my|our|your)\s+)?(?:[a-zA-Z0-9_\-]+\s+){0,3}[a-zA-Z0-9_\-]+'
         
-        # 1. PREFERENCES (likes, loves, enjoys, hates)
-        # STRICTER: Capture only specific Noun Phrases, max 5 words
         pref_patterns = [
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:really\s+)?(?:like|love|enjoy|adore)s?\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'),
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:hate|dislike|can\'t stand)s?\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'dislikes'),
-            (r'my\s+favorite\s+(\w+)\s+(?:is|are)\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'), 
-            (r'\b(?:i|' + speaker.lower() + r')\s+(?:am|\'m)\s+(?:a\s+)?(?:big\s+)?fan\s+of\s+((?:[a-zA-Z0-9_\-]+\s?){1,5})', 'likes'),
+            (r'\b(?:i|' + re.escape(speaker.lower()) + r')\s+(?:really\s+)?(?:like|love|enjoy|adore)s?\s+(' + noun_phrase + ')', 'likes'),
+            (r'\b(?:i|' + re.escape(speaker.lower()) + r')\s+(?:hate|dislike|can\'t stand)s?\s+(' + noun_phrase + ')', 'dislikes'),
+            (r'my\s+favorite\s+(\w+)\s+(?:is|are)\s+(' + noun_phrase + ')', 'likes'), 
+            (r'\b(?:i|' + re.escape(speaker.lower()) + r')\s+(?:am|\'m)\s+(?:a\s+)?(?:big\s+)?fan\s+of\s+(' + noun_phrase + ')', 'likes'),
         ]
         
         for pattern, relation in pref_patterns:
             for match in re.finditer(pattern, text_lower):
-                if match.lastindex == 2:
-                    target = match.group(2).strip()
-                else:
-                    target = match.group(1).strip()
-                    
-                parts = re.split(r'\s+and\s+', target)
+                target = match.group(match.lastindex).strip()
+                # Split compound items "apples and oranges"
+                parts = re.split(r'\s+(?:and|or)\s+', target)
                 for part in parts:
                     add_fact(speaker, relation, part, "preference")
 
-        # 2. LOCATIONS (lives in, moved to/from) -> Keep strict [A-Z] patterns
+        # 2. LOCATIONS
         loc_patterns = [
-            (r'\b(?:i\s+)?(?:live|lives|living|reside|residing)\s+in\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'lives_in'),
-            (r'\b(?:i\s+)?(?:moved|moving|relocated)\s+to\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'moved_to'),
-            (r'\b(?:i\s+)?(?:moved|came)\s+from\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'moved_from'),
-            (r'\bfrom\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:\d+\s+)?(?:years?|months?)\s+ago', 'moved_from'),
+            (r'(?:live|lives|living|reside)\s+in\s+([A-Z][a-zA-Z\s]+)', 'lives_in'),
+            (r'(?:moved|moving)\s+to\s+([A-Z][a-zA-Z\s]+)', 'moved_to'),
+            (r'(?:from|born\s+in)\s+([A-Z][a-zA-Z\s]+)', 'is_from'),
         ]
         
         for pattern, relation in loc_patterns:
-            match = re.search(pattern, text) 
+            match = re.search(pattern, text) # Case sensitive for Locations usually good
             if match:
                 add_fact(speaker, relation, match.group(1), "location")
         
         # 3. WORK/CAREER
         work_patterns = [
-            (r'\b(?:i\s+)?(?:work|works|working)\s+(?:at|for)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)', 'works_at'),
-            # "work as a X" - X must be short (e.g. teacher, engineer)
-            (r'\b(?:i\s+)?(?:work|works|working)\s+as\s+(?:a|an)\s+([a-zA-Z\s]{3,20})', 'works_as'),
-            (r'\b(?:i\s+am|i\'m)\s+(?:a|an)\s+([a-zA-Z\s]{3,20})\s+(?:at|for|in)', 'is_a'), 
-            # "My job is..."
-            (r'\bmy\s+(?:job|career|profession)\s+(?:is|was)\s+(?:a|an)?\s*([a-zA-Z\s]{3,20})', 'works_as'),
+            (r'(?:work|works)\s+(?:at|for)\s+([A-Z][a-zA-Z0-9\s]+)', 'works_at'),
+            (r'work\s+as\s+(?:a|an)\s+([a-zA-Z\s]+)', 'works_as'), 
+            (r'(?:am|is)\s+(?:a|an)\s+([a-zA-Z\s]+)\s+(?:at|for)', 'is_a'), 
         ]
         
         for pattern, relation in work_patterns:
-            match = re.search(pattern, text) 
-            if not match:
-                match = re.search(pattern, text, re.IGNORECASE)
-            
+            match = re.search(pattern, text)
             if match:
                 etype = "organization" if relation == "works_at" else "concept"
                 add_fact(speaker, relation, match.group(1), etype)
 
-        # 4. RELATIONSHIPS (friend, family, married)
+        # 4. RELATIONSHIPS
+        # "My friend Bob", "Bob is my friend"
         rel_patterns = [
-            (r'\bmy\s+(?:friend|buddy|pal)\s+([A-Z][a-z]+)', 'friend_of'),
-            (r'\b([A-Z][a-z]+)\s+is\s+my\s+friend', 'friend_of'),
-            (r'\bfriends?\s+with\s+([A-Z][a-z]+)', 'friend_of'),
-            (r'\bmarried\s+to\s+([A-Z][a-z]+)', 'married_to'),
-            (r'\bmy\s+(?:wife|husband|spouse)\s+(?:is\s+)?([A-Z][a-z]+)?', 'married_to'),
-            (r'\bmy\s+(sister|brother|mother|father|mom|dad|son|daughter)\s+(?:is\s+)?([A-Z][a-z]+)?', 'family'),
+            (r'(?:[Mm]y|[Oo]ur)\s+(?:[Ff]riend|[Bb]uddy|[Pp]al|[Ww]ife|[Hh]usband|[Mm]om|[Dd]ad|[Ss]on|[Dd]aughter|[Ss]ister|[Bb]rother)\s+([A-Z][a-z]+)', 'knows'),
+            (r'([A-Z][a-z]+)\s+is\s+(?:[Mm]y|[Oo]ur)\s+(?:[Ff]riend|[Bb]uddy|[Ww]ife|[Hh]usband)', 'knows'),
         ]
-        
         for pattern, relation in rel_patterns:
-            match = re.search(pattern, text) 
+            match = re.search(pattern, text) # Strict case for Person Name
             if match:
-                obj = match.group(1).strip() if match.group(1) else ""
-                add_fact(speaker, relation, obj, "person")
-        
+                add_fact(speaker, relation, match.group(1), "person")
+
         # 5. ATTRIBUTES (is vegetarian, is allergic, has)
         attr_patterns = [
-            (r'\b(?:i\s+am|i\'m)\s+(vegetarian|vegan|single|married|divorced)', 'is'),
-            (r'\b(?:i\s+am|i\'m)\s+allergic\s+to\s+([a-zA-Z\s]{3,20})', 'allergic_to'),
-            (r'\b(?:i\s+have|i\'ve\s+got)\s+(?:a|an)?\s*([a-zA-Z\s]{3,20})\s+allergy', 'allergic_to'),
-            (r'\b(?:i\s+am|i\'m)\s+(\d+)\s+years?\s+old', 'age_is'),
+            (r'\b(?:[Ii]\s+[Aa]m|[Ii]\'m)\s+(vegetarian|vegan|single|married|divorced)', 'is'),
+            (r'\b(?:[Ii]\s+[Aa]m|[Ii]\'m|[Ii])\s+(?:am\s+)?allergic\s+to\s+([a-zA-Z\s]{3,20})', 'allergic_to'),
+            (r'\b(?:[Ii]\s+[Hh]ave|[Ii]\'ve\s+got)\s+(?:a|an)?\s*([a-zA-Z\s]{3,20})\s+allergy', 'allergic_to'),
+            (r'\b(?:[Ii]\s+[Aa]m|[Ii]\'m)\s+(\d+)\s+years?\s+old', 'age_is'),
         ]
         
         for pattern, relation in attr_patterns:
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, text, re.IGNORECASE) # Attributes can be case insensitive
             if match:
                 add_fact(speaker, relation, match.group(1), "attribute")
         
-        # 6. EVENTS (went to, attended, visited)
-        # Use simple capture with validation
+        # 6. EVENTS (Simple)
         event_patterns = [
-            (r'\b(?:i\s+)?(?:went|traveled|visited)\s+(?:to\s+)?((?:[a-zA-Z0-9\-]+\s?){1,5})', 'visited'),
-            (r'\b(?:i\s+)?(?:attended|joined|participated\s+in)\s+(?:a|an|the)?\s*((?:[a-zA-Z0-9\-]+\s?){1,6})', 'attended'),
+            # Strict capitalization for location to avoid capturing "yesterday", "today"
+            (r'(?:[Ww]ent|[Tt]ravelled|[Ff]lew)\s+to\s+(?:[Tt]he\s+)?([A-Z][a-zA-Z0-9]*(?:\s+[A-Z][a-zA-Z0-9]*)*)', 'visited'),
+            (r'[Aa]ttended\s+(?:[Tt]he\s+)?([A-Z][a-zA-Z0-9\s]+)', 'attended'),
         ]
-        
         for pattern, relation in event_patterns:
-            # Case insensitive match
-            match = re.search(pattern, text, re.IGNORECASE)
+            match = re.search(pattern, text) # Strict case to avoid capturing lowercase time words
             if match:
-                obj = match.group(1).strip()
-                # Manual filter for common verbs mis-captured
-                if obj.lower() in ['sleep', 'bed', 'work', 'home', 'school']:
-                     pass # Maybe allow school/work/home?
-                else:
-                    add_fact(speaker, relation, obj, "event")
-        
-        # 7. TEMPORAL FACTS
-        duration_patterns = [
-            (r'\bfor\s+(\d+\s+(?:years?|months?|weeks?|days?))', 'duration'),
-            (r'(\d+\s+(?:years?|months?|weeks?|days?))\s+ago', 'ago'),
-            (r'\bsince\s+(\d{4})', 'since'),
-        ]
-        
-        for pattern, relation in duration_patterns:
-            match = re.search(pattern, text_lower)
-            if match:
-                add_fact(speaker, f"has_{relation}", match.group(1), "temporal")
-        
+                 add_fact(speaker, relation, match.group(1), "event")
+
         return {
             "entities": entities,
             "relations": relations,
