@@ -14,6 +14,7 @@ Key Features:
 - Evidence aggregation for multi-hop
 """
 
+import logging
 import re
 from typing import List, Dict, Optional, Tuple, Set, Any
 from dataclasses import dataclass, field
@@ -23,6 +24,9 @@ import math
 
 from .graph_store import GraphMemoryStore, Entity, Triplet, EntityType, RelationType
 from .tiered_memory import TieredMemory, MemoryItem, TopicCategory
+from .embedder import get_embedder, get_reranker
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -253,15 +257,23 @@ class AdvancedRetriever:
         self,
         graph_store: GraphMemoryStore = None,
         tiered_memory: TieredMemory = None,
+        memory_store=None,  # Reference to MemoryStoreV5 for episode access
         llm_model: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
+        openai_api_key: Optional[str] = None,
     ):
         self.graph = graph_store
         self.tiered = tiered_memory
+        self.memory_store = memory_store  # For episode search
         self.llm_model = llm_model
         self.ollama_url = ollama_url
+        self.openai_api_key = openai_api_key
         
         self._llm = None
+        
+        # Embedding + reranking
+        self.embedder = get_embedder()
+        self.reranker = get_reranker()
         
         # Initialize CoE if graph available
         self.coe = ChainOfExplorations(graph_store) if graph_store else None
@@ -358,14 +370,22 @@ class AdvancedRetriever:
         """Get or create LLM instance."""
         if self._llm is None:
             try:
-                from langchain_ollama import ChatOllama
-                self._llm = ChatOllama(
-                    model=self.llm_model,
-                    temperature=0.3,
-                    base_url=self.ollama_url,
-                )
+                if self.openai_api_key or "gpt" in self.llm_model.lower():
+                    from langchain_openai import ChatOpenAI
+                    self._llm = ChatOpenAI(
+                        model=self.llm_model,
+                        temperature=0.3,
+                        api_key=self.openai_api_key
+                    )
+                else:
+                    from langchain_ollama import ChatOllama
+                    self._llm = ChatOllama(
+                        model=self.llm_model,
+                        temperature=0.3,
+                        base_url=self.ollama_url,
+                    )
             except Exception as e:
-                print(f"LLM init error: {e}")
+                logger.error(f"LLM init error: {e}")
         return self._llm
     
     def retrieve(
@@ -421,6 +441,11 @@ class AdvancedRetriever:
             coe_results = self._retrieve_coe(query, top_k)
             all_results.extend(coe_results)
         
+        # Episode search (raw conversation fallback)
+        if self.memory_store and hasattr(self.memory_store, 'search_episodes'):
+            episode_results = self._retrieve_from_episodes(query, top_k)
+            all_results.extend(episode_results)
+        
         # Re-rank and deduplicate
         final_results = self._rerank_results(all_results, query, top_k)
         
@@ -472,7 +497,7 @@ Answer passage (1-2 sentences):"""
             response = llm.invoke([HumanMessage(content=prompt)])
             return response.content.strip()
         except Exception as e:
-            print(f"HyDE generation error: {e}")
+            logger.warning(f"HyDE generation error: {e}")
             return None
     
     def _retrieve_from_graph(
@@ -480,12 +505,12 @@ Answer passage (1-2 sentences):"""
         queries: List[str],
         top_k: int,
     ) -> List[RetrievalResult]:
-        """Retrieve from graph store."""
+        """Retrieve from graph store using keyword + semantic search."""
         results = []
         seen_ids = set()
         
         for query in queries:
-            # Text search on triplets
+            # 1. Keyword text search on triplets
             triplet_results = self.graph.search_triplets_by_text(query, top_k=top_k)
             
             for triplet, score in triplet_results:
@@ -497,6 +522,27 @@ Answer passage (1-2 sentences):"""
                     content=triplet.as_text(),
                     score=score,
                     source_type="graph",
+                    source_id=triplet.triplet_id,
+                    metadata={
+                        "subject": triplet.subject.name,
+                        "relation": triplet.predicate.relation_type.value,
+                        "object": triplet.object.name,
+                        "date": triplet.source_date,
+                    },
+                ))
+            
+            # 2. Semantic (embedding) search on triplets
+            semantic_results = self.graph.semantic_search_triplets(query, top_k=top_k)
+            
+            for triplet, score in semantic_results:
+                if triplet.triplet_id in seen_ids:
+                    continue
+                seen_ids.add(triplet.triplet_id)
+                
+                results.append(RetrievalResult(
+                    content=triplet.as_text(),
+                    score=score,
+                    source_type="graph_semantic",
                     source_id=triplet.triplet_id,
                     metadata={
                         "subject": triplet.subject.name,
@@ -572,6 +618,33 @@ Answer passage (1-2 sentences):"""
         
         return results
     
+    def _retrieve_from_episodes(
+        self,
+        query: str,
+        top_k: int,
+    ) -> List[RetrievalResult]:
+        """Retrieve from raw episode store as fallback."""
+        if not self.memory_store:
+            return []
+        
+        results = []
+        episode_results = self.memory_store.search_episodes(query, top_k=top_k)
+        
+        for episode, score in episode_results:
+            results.append(RetrievalResult(
+                content=f"[{episode.speaker}] {episode.content}",
+                score=score * 0.9,  # Slightly lower weight than structured facts
+                source_type="episode",
+                source_id=episode.episode_id,
+                metadata={
+                    "speaker": episode.speaker,
+                    "date": episode.date,
+                    "session_id": episode.session_id,
+                },
+            ))
+        
+        return results
+    
     def _is_multi_hop_query(self, query: str) -> bool:
         """Detect if query requires multi-hop reasoning."""
         query_lower = query.lower()
@@ -596,34 +669,41 @@ Answer passage (1-2 sentences):"""
         query: str,
         top_k: int,
     ) -> List[RetrievalResult]:
-        """Re-rank results with relevance and diversity."""
+        """Re-rank results using CrossEncoder + diversity selection."""
         if not results:
             return []
         
-        # Score adjustment based on query match
-        query_words = set(query.lower().split())
+        # Stage 1: Cross-encoder reranking (pairwise query-passage scoring)
+        try:
+            passages = [r.content for r in results]
+            reranked = self.reranker.rerank(query, passages, top_k=min(len(results), top_k * 3))
+            
+            for idx, score in reranked:
+                results[idx].score = float(score)
+        except Exception as e:
+            logger.warning(f"Cross-encoder reranking failed, falling back to heuristic: {e}")
+            # Fallback: word-overlap scoring
+            query_words = set(query.lower().split())
+            for result in results:
+                content_words = set(result.content.lower().split())
+                overlap = query_words & content_words
+                overlap_boost = len(overlap) / (len(query_words) + 1) * 0.3
+                result.score += overlap_boost
         
+        # Stage 2: Source-type bonuses
         for result in results:
-            content_words = set(result.content.lower().split())
-            overlap = query_words & content_words
-            
-            # Boost for word overlap
-            overlap_boost = len(overlap) / (len(query_words) + 1) * 0.3
-            result.score += overlap_boost
-            
-        # Boost for source diversity
             if result.source_type == "coe_path":
                 result.score += 0.1  # Multi-hop bonus
-            if result.source_type == "graph":
+            if result.source_type in ("graph", "graph_semantic"):
                 result.score += 0.05  # Structured data bonus
+            if result.source_type == "episode":
+                result.score += 0.02  # Episode fallback slight bonus
             
-            # Temporal Relevance Boosting [NEW]
+            # Temporal relevance boosting
             if self._is_temporal_query(query) and self._has_temporal_content(result.content):
-                # Significant boost for temporal content matching temporal query
-                # This prioritizes "I went yesterday" over generic "I like..."
                 result.score += 0.5
         
-        # Sort by score
+        # Sort by final score
         results.sort(key=lambda x: x.score, reverse=True)
         
         # Diversity selection
@@ -631,7 +711,6 @@ Answer passage (1-2 sentences):"""
         seen_content_hashes = set()
         
         for result in results:
-            # Simple content hash for dedup
             content_hash = hash(result.content.lower()[:50])
             
             if content_hash not in seen_content_hashes:
@@ -694,9 +773,10 @@ Answer passage (1-2 sentences):"""
         char_limit = max_tokens * 4  # Rough token-to-char ratio
         
         # Group by source type
-        graph_results = [r for r in results if r.source_type == "graph"]
+        graph_results = [r for r in results if r.source_type in ("graph", "graph_semantic")]
         tiered_results = [r for r in results if "tiered" in r.source_type]
         coe_results = [r for r in results if r.source_type == "coe_path"]
+        episode_results = [r for r in results if r.source_type == "episode"]
         
         # Add graph facts
         if graph_results:
@@ -735,6 +815,23 @@ Answer passage (1-2 sentences):"""
                 conv_date = r.metadata.get("date")
                 if conv_date:
                     # Check for relative date expressions and resolve them
+                    resolved_date = self._resolve_relative_date_in_text(r.content, conv_date)
+                    if resolved_date:
+                        line += f" [EVENT: {resolved_date}]"
+                    else:
+                        line += f" [{conv_date}]"
+                
+                if total_chars + len(line) < char_limit:
+                    parts.append(line)
+                    total_chars += len(line)
+        
+        # Add relevant conversations (episodes)
+        if episode_results:
+            parts.append("\nRELEVANT CONVERSATIONS:")
+            for r in episode_results[:8]:
+                line = f"- {r.content}"
+                conv_date = r.metadata.get("date")
+                if conv_date:
                     resolved_date = self._resolve_relative_date_in_text(r.content, conv_date)
                     if resolved_date:
                         line += f" [EVENT: {resolved_date}]"
