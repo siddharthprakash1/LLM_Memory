@@ -12,6 +12,7 @@ langchain-core>=0.1.0
 langchain-ollama>=0.0.1
 langgraph>=0.0.10
 langgraph-checkpoint-sqlite>=1.0.0
+sentence-transformers>=2.2.0
 
 # Development dependencies
 pytest>=7.0.0
