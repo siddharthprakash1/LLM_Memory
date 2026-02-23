@@ -22,6 +22,8 @@ ui_agent_memory/
 benchmark_*.json
 benchmark_run.log
 benchmarks/datasets/
+benchmarks/longmemeval/data/
+benchmarks/reports/longmemeval_v5_*
 .env
 *.db
 *.log
