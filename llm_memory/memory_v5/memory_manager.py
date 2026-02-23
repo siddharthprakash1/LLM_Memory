@@ -15,11 +15,14 @@ Key Features (from Memory-R1 paper):
 """
 
 import json
+import logging
 from typing import List, Dict, Optional, Tuple, Any, Callable
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
 import re
+
+logger = logging.getLogger(__name__)
 
 
 class MemoryOperation(Enum):
@@ -83,15 +86,17 @@ class MemoryManager:
         self,
         similarity_threshold: float = 0.8,
         contradiction_threshold: float = 0.7,
-        use_llm: bool = True,
+        use_llm: bool = False,
         llm_model: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
+        openai_api_key: Optional[str] = None,
     ):
         self.similarity_threshold = similarity_threshold
         self.contradiction_threshold = contradiction_threshold
         self.use_llm = use_llm
         self.llm_model = llm_model
         self.ollama_url = ollama_url
+        self.openai_api_key = openai_api_key
         
         self._llm = None
         
@@ -118,14 +123,22 @@ class MemoryManager:
         """Get or create LLM instance."""
         if self._llm is None and self.use_llm:
             try:
-                from langchain_ollama import ChatOllama
-                self._llm = ChatOllama(
-                    model=self.llm_model,
-                    temperature=0.1,
-                    base_url=self.ollama_url,
-                )
+                if self.openai_api_key or "gpt" in self.llm_model.lower():
+                    from langchain_openai import ChatOpenAI
+                    self._llm = ChatOpenAI(
+                        model=self.llm_model,
+                        temperature=0.1,
+                        api_key=self.openai_api_key
+                    )
+                else:
+                    from langchain_ollama import ChatOllama
+                    self._llm = ChatOllama(
+                        model=self.llm_model,
+                        temperature=0.1,
+                        base_url=self.ollama_url,
+                    )
             except Exception as e:
-                print(f"LLM init error: {e}")
+                logger.error(f"LLM init error: {e}")
                 self._llm = None
         return self._llm
     
@@ -280,7 +293,7 @@ Respond with JSON:
                     reasoning=data.get('reasoning', 'LLM decision'),
                 )
         except Exception as e:
-            print(f"LLM decision error: {e}")
+            logger.warning(f"LLM decision error: {e}")
         
         # Fallback to rule-based
         return self.decide_operation(candidate, existing_memories)
