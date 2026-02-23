@@ -81,9 +81,11 @@ class ProspectiveReflection:
         self,
         llm_model: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
+        openai_api_key: Optional[str] = None,
     ):
         self.llm_model = llm_model
         self.ollama_url = ollama_url
+        self.openai_api_key = openai_api_key
         self._llm = None
         
         # Memory hierarchy
@@ -103,12 +105,20 @@ class ProspectiveReflection:
         """Get or create LLM instance."""
         if self._llm is None:
             try:
-                from langchain_ollama import ChatOllama
-                self._llm = ChatOllama(
-                    model=self.llm_model,
-                    temperature=0.3,
-                    base_url=self.ollama_url,
-                )
+                if self.openai_api_key or "gpt" in self.llm_model.lower():
+                    from langchain_openai import ChatOpenAI
+                    self._llm = ChatOpenAI(
+                        model=self.llm_model,
+                        temperature=0.3,
+                        api_key=self.openai_api_key
+                    )
+                else:
+                    from langchain_ollama import ChatOllama
+                    self._llm = ChatOllama(
+                        model=self.llm_model,
+                        temperature=0.3,
+                        base_url=self.ollama_url,
+                    )
             except Exception:
                 self._llm = None
         return self._llm
@@ -493,8 +503,9 @@ class ReflectiveManager:
         self,
         llm_model: str = "qwen2.5:7b",
         ollama_url: str = "http://localhost:11434",
+        openai_api_key: Optional[str] = None,
     ):
-        self.prospective = ProspectiveReflection(llm_model, ollama_url)
+        self.prospective = ProspectiveReflection(llm_model, ollama_url, openai_api_key)
         self.retrospective = RetrospectiveReflection()
     
     def add_conversation_turn(
