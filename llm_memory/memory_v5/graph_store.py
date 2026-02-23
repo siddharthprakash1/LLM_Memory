@@ -20,6 +20,7 @@ Graph Structure:
 """
 
 import json
+import logging
 import sqlite3
 import hashlib
 from typing import List, Dict, Optional, Tuple, Set, Any
@@ -27,6 +28,10 @@ from dataclasses import dataclass, field, asdict
 from datetime import datetime
 from enum import Enum
 import numpy as np
+
+from llm_memory.memory_v5.embedder import get_embedder, MemoryEmbedder
+
+logger = logging.getLogger(__name__)
 
 
 class EntityType(Enum):
@@ -190,7 +195,24 @@ class Triplet:
     superseded_by: Optional[str] = None
     
     def as_text(self) -> str:
-        """Convert triplet to natural language."""
+        """Convert triplet to rich natural language including provenance."""
+        rel = self.predicate.relation_type.value.replace("_", " ")
+        parts = [f"{self.subject.name} {rel} {self.object.name}"]
+        if self.source_date:
+            parts.append(f"(date: {self.source_date})")
+        if self.predicate.confidence < 0.9:
+            parts.append(f"(confidence: {self.predicate.confidence:.0%})")
+        if self.predicate.properties:
+            if "temporal_scope" in self.predicate.properties:
+                parts.append(f"(scope: {self.predicate.properties['temporal_scope']})")
+            if "duration" in self.predicate.properties:
+                parts.append(f"(duration: {self.predicate.properties['duration']})")
+        if not self.is_current:
+            parts.append("[SUPERSEDED]")
+        return " ".join(parts)
+
+    def as_short_text(self) -> str:
+        """Convert triplet to bare triple text (for embedding indexing)."""
         rel = self.predicate.relation_type.value.replace("_", " ")
         return f"{self.subject.name} {rel} {self.object.name}"
     
@@ -216,10 +238,12 @@ class GraphMemoryStore:
         db_path: str = "./memory_v5_graph.db",
         embedding_dim: int = 384,
         similarity_threshold: float = 0.85,
+        embedder: MemoryEmbedder = None,
     ):
         self.db_path = db_path
         self.embedding_dim = embedding_dim
         self.similarity_threshold = similarity_threshold
+        self.embedder = embedder or get_embedder()
         
         # In-memory indexes
         self.entities: Dict[str, Entity] = {}
@@ -237,7 +261,14 @@ class GraphMemoryStore:
         self.entities_by_type: Dict[EntityType, Set[str]] = {t: set() for t in EntityType}
         self.relations_by_type: Dict[RelationType, Set[str]] = {t: set() for t in RelationType}
         
+        # Embedding index for semantic search over triplets
+        self._triplet_embeddings: Dict[str, np.ndarray] = {}  # triplet_id -> embedding
+        self._embedding_matrix: Optional[np.ndarray] = None  # cached stacked matrix
+        self._embedding_ids: List[str] = []  # ordered triplet_ids matching matrix rows
+        self._embeddings_dirty: bool = True  # flag to rebuild matrix
+        
         self._init_db()
+        self._load_from_db()
     
     def _init_db(self):
         """Initialize SQLite database for persistence."""
@@ -304,6 +335,86 @@ class GraphMemoryStore:
         conn.commit()
         conn.close()
     
+    def _load_from_db(self):
+        """Load in-memory state from database."""
+        try:
+            conn = sqlite3.connect(self.db_path)
+            conn.row_factory = sqlite3.Row
+            
+            # 1. Load Entities
+            cursor = conn.execute("SELECT * FROM entities")
+            for row in cursor:
+                data = dict(row)
+                if data.get('embedding'):
+                    data['embedding'] = json.loads(data['embedding'])
+                if data.get('metadata'):
+                    data['metadata'] = json.loads(data['metadata'])
+                
+                entity = Entity.from_dict(data)
+                self.entities[entity.entity_id] = entity
+                self.entity_name_index[self._normalize_name(entity.name)] = entity.entity_id
+                self.entities_by_type[entity.entity_type].add(entity.entity_id)
+                
+                # Init adjacency
+                if entity.entity_id not in self.outgoing_edges:
+                    self.outgoing_edges[entity.entity_id] = []
+                if entity.entity_id not in self.incoming_edges:
+                    self.incoming_edges[entity.entity_id] = []
+
+            # 2. Load Relations
+            cursor = conn.execute("SELECT * FROM relations")
+            for row in cursor:
+                data = dict(row)
+                if data.get('properties'):
+                    data['properties'] = json.loads(data['properties'])
+                # Convert is_valid from int to bool
+                data['is_valid'] = bool(data['is_valid'])
+                
+                relation = Relation.from_dict(data)
+                self.relations[relation.relation_id] = relation
+                self.relations_by_type[relation.relation_type].add(relation.relation_id)
+                
+                # Rebuild adjacency
+                if relation.source_id in self.outgoing_edges:
+                    self.outgoing_edges[relation.source_id].append(relation.relation_id)
+                if relation.target_id in self.incoming_edges:
+                    self.incoming_edges[relation.target_id].append(relation.relation_id)
+
+            # 3. Load Triplets
+            cursor = conn.execute("SELECT * FROM triplets")
+            for row in cursor:
+                data = dict(row)
+                
+                # Reconstruct triplet logic
+                subject = self.entities.get(data['subject_id'])
+                relation = self.relations.get(data['relation_id'])
+                obj = self.entities.get(data['object_id'])
+                
+                if subject and relation and obj:
+                    triplet = Triplet(
+                        triplet_id=data['triplet_id'],
+                        subject=subject,
+                        predicate=relation,
+                        object=obj,
+                        source_speaker=data['source_speaker'],
+                        source_date=data['source_date'],
+                        source_session=data['source_session'],
+                        extraction_time=data['extraction_time'],
+                        is_current=bool(data['is_current']),
+                        superseded_by=data['superseded_by']
+                    )
+                    self.triplets[triplet.triplet_id] = triplet
+
+            conn.close()
+            
+            # Build triplet embedding index from loaded data
+            self._rebuild_triplet_embeddings()
+            
+            logger.info(f"Graph loaded: {len(self.entities)} entities, {len(self.triplets)} triplets")
+            
+        except Exception as e:
+            logger.error(f"Error loading graph from DB: {e}")
+
     def _generate_id(self, prefix: str = "id") -> str:
         """Generate unique ID."""
         import uuid
@@ -314,10 +425,13 @@ class GraphMemoryStore:
         return name.strip().lower().replace("_", " ")
     
     def _compute_embedding(self, text: str) -> Optional[List[float]]:
-        """Compute embedding for text (placeholder - integrate with actual embedder)."""
-        # In production, use sentence-transformers or similar
-        # For now, return None and rely on text matching
-        return None
+        """Compute embedding for text using sentence-transformers."""
+        try:
+            vec = self.embedder.encode_single(text)
+            return vec.tolist()
+        except Exception as e:
+            logger.warning(f"Embedding computation failed for '{text[:50]}': {e}")
+            return None
     
     def _cosine_similarity(self, vec1: List[float], vec2: List[float]) -> float:
         """Compute cosine similarity between two vectors."""
@@ -553,6 +667,9 @@ class GraphMemoryStore:
         self.triplets[triplet.triplet_id] = triplet
         self._save_triplet(triplet)
         
+        # Index embedding for semantic search
+        self._index_triplet_embedding(triplet)
+        
         return triplet
     
     def _find_existing_triplet(
@@ -697,6 +814,85 @@ class GraphMemoryStore:
                             triplets.append(t)
         
         return triplets
+    
+    # ==========================================
+    # EMBEDDING INDEX MANAGEMENT
+    # ==========================================
+    
+    def _index_triplet_embedding(self, triplet: Triplet):
+        """Compute and store embedding for a single triplet."""
+        text = triplet.as_short_text()
+        try:
+            vec = self.embedder.encode_single(text)
+            self._triplet_embeddings[triplet.triplet_id] = vec
+            self._embeddings_dirty = True
+        except Exception as e:
+            logger.warning(f"Failed to embed triplet {triplet.triplet_id}: {e}")
+    
+    def _rebuild_triplet_embeddings(self):
+        """Rebuild embedding index for all current triplets."""
+        current_triplets = [t for t in self.triplets.values() if t.is_current]
+        if not current_triplets:
+            self._triplet_embeddings = {}
+            self._embedding_matrix = None
+            self._embedding_ids = []
+            self._embeddings_dirty = False
+            return
+        
+        texts = [t.as_short_text() for t in current_triplets]
+        try:
+            vecs = self.embedder.encode(texts)
+            self._triplet_embeddings = {}
+            for triplet, vec in zip(current_triplets, vecs):
+                self._triplet_embeddings[triplet.triplet_id] = vec
+            self._embeddings_dirty = True
+            self._ensure_embedding_matrix()
+            logger.info(f"Rebuilt embeddings for {len(current_triplets)} triplets")
+        except Exception as e:
+            logger.warning(f"Failed to rebuild triplet embeddings: {e}")
+    
+    def _ensure_embedding_matrix(self):
+        """Rebuild the stacked embedding matrix if dirty."""
+        if not self._embeddings_dirty:
+            return
+        if not self._triplet_embeddings:
+            self._embedding_matrix = None
+            self._embedding_ids = []
+        else:
+            self._embedding_ids = list(self._triplet_embeddings.keys())
+            self._embedding_matrix = np.stack(
+                [self._triplet_embeddings[tid] for tid in self._embedding_ids]
+            )
+        self._embeddings_dirty = False
+    
+    def semantic_search_triplets(
+        self,
+        query: str,
+        top_k: int = 20,
+        threshold: float = 0.25,
+    ) -> List[Tuple[Triplet, float]]:
+        """
+        Semantic search over triplets using dense embeddings.
+        
+        Returns (triplet, score) pairs sorted by cosine similarity.
+        """
+        self._ensure_embedding_matrix()
+        if self._embedding_matrix is None or len(self._embedding_ids) == 0:
+            return []
+        
+        query_vec = self.embedder.encode_single(query)
+        results = self.embedder.top_k_indices(
+            query_vec, self._embedding_matrix, top_k=top_k, threshold=threshold
+        )
+        
+        triplet_results = []
+        for idx, score in results:
+            tid = self._embedding_ids[idx]
+            triplet = self.triplets.get(tid)
+            if triplet and triplet.is_current:
+                triplet_results.append((triplet, score))
+        
+        return triplet_results
     
     # ==========================================
     # CONFLICT DETECTION
