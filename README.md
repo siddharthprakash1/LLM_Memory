@@ -11,6 +11,7 @@
 ## Table of contents
 
 - [Visual tour (UI + architecture)](#visual-tour-ui--architecture)
+- [Architecture & versions](#architecture--versions)
 - [Why this exists (the problem)](#why-this-exists-the-problem)
 - [What you get](#what-you-get)
 - [Core concepts (how memory is represented)](#core-concepts-how-memory-is-represented)
@@ -39,6 +40,18 @@
 ![Tiered memory overview](docs/assets/tiered_memory_overview.svg)
 
 > Replace these SVGs with real screenshots later (same paths keep the README stable).
+
+---
+
+## Architecture & versions
+
+This repo is a build-in-public lineage: **V5 is the active stack, V4 is the reference.** Full component diagrams, write/read data flows, and an honest benchmark read live in **[`docs/architecture/`](docs/architecture/README.md)**.
+
+| Version | Idea | Status | Deep dive |
+|---|---|---|---|
+| **V3** | raw text + embeddings + entity knowledge graph | exported | [v3.md](docs/architecture/v3.md) |
+| **V4** | **facts-first** LLM extraction + conflict + temporal | reference | [v4.md](docs/architecture/v4.md) |
+| **V5** | **graph + tiered memory + cross-encoder reranking** | **active** | [v5.md](docs/architecture/v5.md) |
 
 ---
 
@@ -293,6 +306,19 @@ Key numbers from that report:
 
 Overall composite score (same report): **33.7 / 100**.
 
+### V4 vs V5 on LOCOMO — Claude Haiku (honest read)
+
+Controlled run on one conversation (`conv-26`, **n≈199 questions**) with `claude-haiku-4-5`:
+
+| Category | V4 F1 | V5 F1 | mem0 ref |
+|---|---:|---:|---:|
+| temporal | 0.449 | 0.436 | 0.300 |
+| single-hop | 0.173 | 0.175 | 0.420 |
+| multi-hop | 0.144 | 0.065 | 0.250 |
+| **Overall** | **0.242** | **0.244** | — |
+
+**Honest takeaways:** temporal beats the mem0 baseline; **V5 ≈ V4 on accuracy** (the rewrite mainly bought ~2.5× speed — 9 min vs 23 min); the real bottleneck is the **retrieval pipeline, not the model**. Directional only (one conversation, small cloud model). Full read: [docs/architecture/](docs/architecture/README.md#results--and-an-honest-read).
+
 ### Run the benchmark suite
 
 ```bash
@@ -406,11 +432,13 @@ Defined in `llm_memory/storage/sqlite.py` (`SCHEMA`):
 
 ## Model configuration
 
-The UI/CLI currently default to `qwen2.5:32b` in:
-- `llm_memory/agents_v4/web_ui.py`
-- `run_agent.py`
+**Local-first by default (Ollama), with an optional Claude/OpenAI path.**
 
-If you want to switch models, update `model_name="..."` in those files (for example, `openthinker:32b` if you have it in Ollama).
+- Benchmarks (`benchmarks/locomo_v4.py` / `locomo_v5.py`) default to a local Ollama model. Pass `--model claude-haiku-4-5` and set `ANTHROPIC_API_KEY` to run on Claude instead.
+- The benchmark visualizer reads `LLM_MEMORY_MODEL` (default `qwen2.5:7b`):
+  `LLM_MEMORY_MODEL=claude-haiku-4-5 ANTHROPIC_API_KEY=... python benchmark_viz.py`
+- Internally, a model name containing `claude` routes V4/V5 LLM calls through `langchain_anthropic`; otherwise `langchain_ollama` (local).
+- The agent UI/CLI default to `qwen2.5:32b` in `llm_memory/agents_v4/web_ui.py` and `run_agent.py` — edit `model_name=` there to switch.
 
 ---
 
