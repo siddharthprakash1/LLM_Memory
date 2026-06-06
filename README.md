@@ -39,7 +39,7 @@
 
 ![Tiered memory overview](docs/assets/tiered_memory_overview.svg)
 
-> Replace these SVGs with real screenshots later (same paths keep the README stable).
+> Diagrams above are SVGs in `docs/assets/` — swap in live screenshots anytime without changing the README.
 
 ---
 
@@ -486,7 +486,6 @@ run_benchmark_ui.py        # Replays LOCOMO into the Web UI
 |---|---|---|
 | `model 'X' not found (404)` | Ollama model not pulled | `ollama pull <model>` then retry |
 | Mermaid “Unable to render rich display” | GitHub Mermaid syntax/labels | Use quoted labels and simple node shapes (this README does) |
-| `fatal: pathspec 'docs/assets' did not match any files` | You’re copying from Cursor worktree but committing Desktop repo | `mkdir -p docs/assets` then copy files (see earlier commands) |
 | Lots of `__pycache__` / `.db` changes | Runtime artifacts in working tree | Don’t add them; update `.gitignore` if needed |
 
 ---
