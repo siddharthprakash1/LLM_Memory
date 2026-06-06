@@ -31,8 +31,8 @@ htmlcov/
 *.log
 
 # ---- Generated databases & memory stores ----
+# NOTE: do NOT use a broad `*_memory/` glob — it would match the `llm_memory/` package.
 *.db
-*_memory/
 benchmark_mem_*/
 benchmark_compare_*/
 benchmark_v5_*/
