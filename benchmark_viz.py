@@ -33,10 +33,12 @@ REASONING_LOGS = []
 def get_memory():
     global MEMORY
     if MEMORY is None:
+        # Local Ollama model by default; set LLM_MEMORY_MODEL=claude-haiku-4-5
+        # (with ANTHROPIC_API_KEY) to use the Claude provider instead.
         MEMORY = MemoryStoreV4(
             user_id="benchmark_viz",
             persist_path=MEMORY_PATH,
-            model_name="qwen2.5:32b"
+            model_name=os.getenv("LLM_MEMORY_MODEL", "qwen2.5:7b"),
         )
     return MEMORY
 

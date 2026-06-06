@@ -18,11 +18,19 @@ class AdvancedRetriever:
     """
     
     def __init__(self, model_name: str = "qwen2.5:32b", ollama_url: str = "http://localhost:11434"):
-        self.llm = ChatOllama(
-            model=model_name,
-            temperature=0.3, # Slightly higher for creative expansion
-            base_url=ollama_url
-        )
+        if "claude" in model_name.lower():
+            from langchain_anthropic import ChatAnthropic
+            self.llm = ChatAnthropic(
+                model=model_name,
+                temperature=0.3,
+                max_tokens=1024,
+            )
+        else:
+            self.llm = ChatOllama(
+                model=model_name,
+                temperature=0.3, # Slightly higher for creative expansion
+                base_url=ollama_url
+            )
 
     def expand_query(self, query: str) -> List[str]:
         """

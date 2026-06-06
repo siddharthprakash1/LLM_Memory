@@ -74,12 +74,20 @@ class QueryDecomposer:
     """
     
     def __init__(self, model_name: str = "qwen2.5:32b", ollama_url: str = "http://localhost:11434"):
-        self.llm = ChatOllama(
-            model=model_name,
-            temperature=0.1,
-            base_url=ollama_url,
-            format="json"
-        )
+        if "claude" in model_name.lower():
+            from langchain_anthropic import ChatAnthropic
+            self.llm = ChatAnthropic(
+                model=model_name,
+                temperature=0.1,
+                max_tokens=1024,
+            )
+        else:
+            self.llm = ChatOllama(
+                model=model_name,
+                temperature=0.1,
+                base_url=ollama_url,
+                format="json"
+            )
         
     def decompose(self, query: str) -> List[str]:
         """Decompose query into sub-questions."""

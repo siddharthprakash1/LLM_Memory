@@ -150,12 +150,20 @@ class LLMFactExtractor:
         """Get or create LLM instance."""
         if self._llm is None:
             try:
-                from langchain_ollama import ChatOllama
-                self._llm = ChatOllama(
-                    model=self.model_name,
-                    temperature=0.1,  # Low temp for extraction
-                    base_url=self.ollama_url,
-                )
+                if "claude" in self.model_name.lower():
+                    from langchain_anthropic import ChatAnthropic
+                    self._llm = ChatAnthropic(
+                        model=self.model_name,
+                        temperature=0.1,
+                        max_tokens=4096,
+                    )
+                else:
+                    from langchain_ollama import ChatOllama
+                    self._llm = ChatOllama(
+                        model=self.model_name,
+                        temperature=0.1,  # Low temp for extraction
+                        base_url=self.ollama_url,
+                    )
             except Exception as e:
                 print(f"LLM init error: {e}")
                 self._llm = None

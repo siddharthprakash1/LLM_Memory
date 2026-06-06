@@ -314,7 +314,14 @@ class LoCoMoBenchmarkV4:
             return self._llm
         
         try:
-            if self.model_provider == "ollama":
+            if self.model_provider == "anthropic" or "claude" in self.model_name.lower():
+                from langchain_anthropic import ChatAnthropic
+                self._llm = ChatAnthropic(
+                    model=self.model_name,
+                    temperature=0.1,
+                    max_tokens=1024,
+                )
+            elif self.model_provider == "ollama":
                 from langchain_ollama import ChatOllama
                 self._llm = ChatOllama(
                     model=self.model_name,
@@ -399,8 +406,21 @@ class LoCoMoBenchmarkV4:
         # Remove quotes and asterisks
         answer = answer.strip('"\'*')
         
-        # Take first line
-        answer = answer.split('\n')[0].strip()
+        # Take first meaningful line, skipping markdown/label headers like "# ANSWER"
+        _label_re = re.compile(r'^\s*#{0,6}\s*(short answer|final answer|answer|temporal info)\s*:?\s*$', re.IGNORECASE)
+        _content = ""
+        for _line in answer.split('\n'):
+            _line = _line.strip()
+            if not _line or _label_re.match(_line):
+                continue
+            _content = _line
+            break
+        if not _content:
+            _content = next((l.strip() for l in answer.split('\n') if l.strip()), "")
+        answer = re.sub(r'^#{1,6}\s*', '', _content).strip()
+        for _prefix in prefixes:
+            if answer.lower().startswith(_prefix.lower()):
+                answer = answer[len(_prefix):].strip()
         
         # Remove timestamps
         answer = re.sub(r'\[\d{1,2}:\d{2}\s*(?:am|pm)[^\]]*\]', '', answer)
